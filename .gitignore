@@ -1,0 +1,16 @@
+target/
+**/target/
+*.class
+.settings/
+**/.settings/
+.project
+**/.project
+.classpath
+**/.classpath
+.factorypath
+**/.factorypath
+build/
+**/build/
+.metadata/
+*.log
+*.tmp
