@@ -27,8 +27,31 @@ public class CategoryController extends HttpServlet {
     private static final long serialVersionUID = 1L;
     public ICategoryService cateService = new CategoryServiceImpl();
 
+    private boolean checkAdminOrManager(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        jakarta.servlet.http.HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute("account") == null) {
+            resp.sendRedirect(req.getContextPath() + "/login");
+            return false;
+        }
+        Object acc = session.getAttribute("account");
+        int roleid = -1;
+        if (acc instanceof Model.User) {
+            roleid = ((Model.User) acc).getRoleid();
+        } else if (acc instanceof vn.iotstar.entity.User) {
+            roleid = ((vn.iotstar.entity.User) acc).getRoleid();
+        }
+        if (roleid != 1 && roleid != 2) {
+            resp.sendRedirect(req.getContextPath() + "/home?error=access_denied");
+            return false;
+        }
+        return true;
+    }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        if (!checkAdminOrManager(req, resp)) {
+            return;
+        }
         String url = req.getRequestURI();
         if (url.contains("/admin/categories") || url.contains("/admin/category/list")) {
             List<Category> list = cateService.findAll();
@@ -56,6 +79,9 @@ public class CategoryController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        if (!checkAdminOrManager(req, resp)) {
+            return;
+        }
         String url = req.getRequestURI();
         if (url.contains("/admin/category/insert")) {
             // lấy dữ liệu từ form

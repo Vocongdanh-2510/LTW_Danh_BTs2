@@ -22,6 +22,10 @@ if exist "%WAR_PATH%" copy /Y "%WAR_PATH%" "%CATALINA_HOME%\webapps\BaiHocDauTie
 echo [3/3] Khoi dong Tomcat...
 start "" "%CATALINA_HOME%\bin\startup.bat"
 
+echo Dang cho server san sang va tu dong mo trinh duyet...
+timeout /t 3 >nul
+start http://localhost:8080/BaiHocDauTien/home
+
 echo.
 echo ==========================================================
 echo >>> KHOI DONG TOMCAT SERVER THANH CONG! <<<

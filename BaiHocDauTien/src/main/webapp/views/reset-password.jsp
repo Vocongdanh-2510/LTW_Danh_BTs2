@@ -205,6 +205,9 @@
             <c:if test="${not empty email}">
                 <div class="email-badge">📧 ${email}</div>
             </c:if>
+            <c:if test="${empty email and not empty sessionScope.forgot_email}">
+                <div class="email-badge">📧 ${sessionScope.forgot_email}</div>
+            </c:if>
 
             <c:if test="${not empty alert}">
                 <div class="alert-danger">${alert}</div>
@@ -215,7 +218,7 @@
             </c:if>
 
             <form action="${pageContext.request.contextPath}/reset-password" method="post">
-                <input type="hidden" name="email" value="${email}">
+                <input type="hidden" name="email" value="${not empty email ? email : sessionScope.forgot_email}">
 
                 <div class="field">
                     <label for="otp">Mã xác nhận OTP (6 chữ số)</label>

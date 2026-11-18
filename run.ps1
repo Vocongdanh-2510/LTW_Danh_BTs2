@@ -15,13 +15,18 @@ if (Test-Path $warPath) {
 Write-Host "[2/2] Khoi dong Tomcat Server..." -ForegroundColor Cyan
 if (Test-Path "$env:CATALINA_HOME\bin\startup.bat") {
     Start-Process "$env:CATALINA_HOME\bin\startup.bat"
+    Start-Sleep -Seconds 3
+    Start-Process "http://localhost:8080/BaiHocDauTien/home"
 }
 
 Write-Host "`n==========================================================" -ForegroundColor Green
 Write-Host ">>> KHOI DONG TOMCAT SERVER THANH CONG! <<<" -ForegroundColor Green
 Write-Host "Mo trinh duyet truy cap cac link sau:" -ForegroundColor Yellow
-Write-Host "👉 Dang nhap:     http://localhost:8080/BaiHocDauTien/login" -ForegroundColor Yellow
-Write-Host "👉 Dang ky (OTP): http://localhost:8080/BaiHocDauTien/register" -ForegroundColor Yellow
-Write-Host "👉 Quen mat khau: http://localhost:8080/BaiHocDauTien/forgot-password" -ForegroundColor Yellow
-Write-Host "👉 Categories:    http://localhost:8080/BaiHocDauTien/admin/categories" -ForegroundColor Yellow
+Write-Host "👉 Trang chu (Top 10 Video):   http://localhost:8080/BaiHocDauTien/home" -ForegroundColor Yellow
+Write-Host "👉 Danh sach Video (6sp/trang): http://localhost:8080/BaiHocDauTien/video" -ForegroundColor Yellow
+Write-Host "👉 Quan ly CRUD Video (Admin):  http://localhost:8080/BaiHocDauTien/admin/videos" -ForegroundColor Yellow
+Write-Host "👉 Categories (Admin):          http://localhost:8080/BaiHocDauTien/admin/categories" -ForegroundColor Yellow
+Write-Host "👉 Dang nhap:                   http://localhost:8080/BaiHocDauTien/login" -ForegroundColor Yellow
+Write-Host "👉 Dang ky (OTP):               http://localhost:8080/BaiHocDauTien/register" -ForegroundColor Yellow
+Write-Host "👉 Quen mat khau:               http://localhost:8080/BaiHocDauTien/forgot-password" -ForegroundColor Yellow
 Write-Host "==========================================================" -ForegroundColor Green

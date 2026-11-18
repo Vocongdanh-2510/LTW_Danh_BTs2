@@ -71,8 +71,11 @@ public class login_controller extends HttpServlet {
         boolean isRememberMe = "on".equals(remember);
         String alertMsg    = "";
 
+        if (username != null) username = username.trim();
+        if (password != null) password = password.trim();
+
         // Validate: không được để trống
-        if (username.isEmpty() || password.isEmpty()) {
+        if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
             alertMsg = "Tài khoản hoặc mật khẩu không được rỗng";
             req.setAttribute("alert", alertMsg);
             req.getRequestDispatcher("/views/login.jsp").forward(req, resp);

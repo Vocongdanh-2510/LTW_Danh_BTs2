@@ -53,30 +53,35 @@ public class ForgotPasswordController extends HttpServlet {
         User user = service.getByEmail(email);
 
         if (user == null) {
-            req.setAttribute("alert", "Không tìm thấy tài khoản với email này trong hệ thống!");
+            req.setAttribute("alert", "Không tìm thấy tài khoản với email hoặc tên đăng nhập này trong hệ thống!");
             req.setAttribute("email", email);
             req.getRequestDispatcher(FORGOT_VIEW).forward(req, resp);
             return;
         }
+
+        // Ưu tiên dùng email thật của user, nếu chưa có thì dùng username
+        String targetIdentifier = (user.getEmail() != null && !user.getEmail().trim().isEmpty())
+                ? user.getEmail().trim()
+                : user.getUserName().trim();
 
         // Sinh mã OTP 6 số
         String otp = EmailUtil.generateOtp();
         long expiry = System.currentTimeMillis() + (5 * 60 * 1000); // 5 phút
 
         // Cập nhật mã OTP vào CSDL
-        service.updateCode(email, otp);
+        service.updateCode(targetIdentifier, otp);
 
         // Lưu thông tin vào session
         HttpSession session = req.getSession(true);
-        session.setAttribute("forgot_email", email);
+        session.setAttribute("forgot_email", targetIdentifier);
         session.setAttribute("forgot_otp", otp);
         session.setAttribute("forgot_expiry", expiry);
 
         // Gửi email chứa mã OTP (đồng thời in ra console server)
-        EmailUtil.sendOtpEmail(email, otp, "Mã xác nhận đặt lại mật khẩu");
+        EmailUtil.sendOtpEmail(targetIdentifier, otp, "Mã xác nhận đặt lại mật khẩu");
 
         // Chuyển hướng sang trang đặt lại mật khẩu
-        String encodedEmail = URLEncoder.encode(email, StandardCharsets.UTF_8.toString());
+        String encodedEmail = URLEncoder.encode(targetIdentifier, StandardCharsets.UTF_8.toString());
         resp.sendRedirect(req.getContextPath() + "/reset-password?email=" + encodedEmail);
     }
 }

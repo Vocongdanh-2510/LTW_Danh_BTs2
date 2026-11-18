@@ -34,8 +34,9 @@
 <body>
 <div class="container">
     <div style="margin-bottom: 15px;">
-        <a class="nav-link" href="<c:url value='/admin/dashboard'/>">← Dashboard</a>
-        <a class="nav-link" href="<c:url value='/user/home'/>">User Home</a>
+        <a class="nav-link" href="<c:url value='/home'/>">🏠 Trang chủ (/home)</a>
+        <a class="nav-link" href="<c:url value='/video'/>">🎬 Xem Videos (/video)</a>
+        <a class="nav-link" href="<c:url value='/admin/videos'/>" style="color: #007bff; font-weight: bold;">⚡ Quản lý Videos</a>
         <a class="nav-link" href="<c:url value='/logout'/>" style="color: #dc3545;">Đăng xuất</a>
     </div>
 

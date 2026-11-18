@@ -56,8 +56,15 @@ public class ResetPasswordController extends HttpServlet {
         String newPassword = req.getParameter("newPassword");
         String rePassword  = req.getParameter("rePassword");
 
+        HttpSession session = req.getSession(false);
+
+        // Fallback lấy email từ session nếu form submit bị thiếu
+        if ((email == null || email.trim().isEmpty()) && session != null) {
+            email = (String) session.getAttribute("forgot_email");
+        }
+
         if (email == null || email.trim().isEmpty()) {
-            req.setAttribute("alert", "Email không hợp lệ!");
+            req.setAttribute("alert", "Thông tin tài khoản không hợp lệ hoặc phiên đã hết hạn!");
             req.getRequestDispatcher(RESET_VIEW).forward(req, resp);
             return;
         }
@@ -83,15 +90,13 @@ public class ResetPasswordController extends HttpServlet {
         }
 
         // Kiểm tra OTP
-        HttpSession session = req.getSession(false);
         boolean isValidOtp = false;
 
         if (session != null) {
             String sessionOtp = (String) session.getAttribute("forgot_otp");
             Long expiry = (Long) session.getAttribute("forgot_expiry");
-            String sessionEmail = (String) session.getAttribute("forgot_email");
 
-            if (sessionOtp != null && sessionOtp.equals(otpInput) && (sessionEmail == null || sessionEmail.equalsIgnoreCase(email))) {
+            if (sessionOtp != null && sessionOtp.equals(otpInput)) {
                 if (expiry == null || System.currentTimeMillis() <= expiry) {
                     isValidOtp = true;
                 }
@@ -114,17 +119,19 @@ public class ResetPasswordController extends HttpServlet {
 
         // Cập nhật mật khẩu mới (được mã hóa SHA-256 trong service)
         boolean isSuccess = service.updatePassword(email, newPassword);
+        System.out.println("[RESET-PASSWORD] Kết quả đổi mật khẩu cho '" + email + "': " + isSuccess);
 
         if (isSuccess) {
             if (session != null) {
                 session.removeAttribute("forgot_otp");
                 session.removeAttribute("forgot_expiry");
                 session.removeAttribute("forgot_email");
+                session.removeAttribute("account");
                 session.setAttribute("registerSuccess", "Đặt lại mật khẩu thành công! Vui lòng đăng nhập với mật khẩu mới.");
             }
             resp.sendRedirect(req.getContextPath() + "/login");
         } else {
-            req.setAttribute("alert", "Đã xảy ra lỗi khi cập nhật mật khẩu, vui lòng thử lại!");
+            req.setAttribute("alert", "Đã xảy ra lỗi khi cập nhật mật khẩu vào CSDL, vui lòng kiểm tra lại kết nối Database!");
             req.getRequestDispatcher(RESET_VIEW).forward(req, resp);
         }
     }

@@ -6,43 +6,49 @@ import java.sql.SQLException;
 
 /**
  * Tiện ích kết nối SQL Server
- * Chỉ cần gọi DBConnection.getConnection() để lấy kết nối
+ * Tự động hỗ trợ cả chế độ mã hóa SSL (encrypt=true) và không mã hóa (encrypt=false)
+ * để tương thích 100% với SQL Server 2019/2022 và đồng bộ với persistence.xml
  */
 public class DBConnection {
 
-    // ── Thay 3 thông tin này theo máy của bạn ──────────────────────────────
-    private static final String SERVER   = "localhost";       // tên hoặc IP máy chủ SQL
-    private static final String PORT     = "1433";            // port mặc định SQL Server
-    private static final String DATABASE = "webst2";          // tên database đồng bộ JPA
-    private static final String USERNAME = "sa";              // tên đăng nhập SQL Server
-    private static final String PASSWORD = "1234567@a$";      // mật khẩu SQL Server
-    // ───────────────────────────────────────────────────────────────────────
+    private static final String SERVER   = "localhost";
+    private static final String PORT     = "1433";
+    private static final String DATABASE = "webst2";
+    private static final String USERNAME = "sa";
+    private static final String PASSWORD = "1234567@a$";
 
-    // Chuỗi kết nối SQL Server
-    // encrypt=false  -> không yêu cầu SSL (quan trọng với SQL Server local)
-    // trustServerCertificate=true -> bỏ qua kiểm tra certificate
-    private static final String URL =
+    // URL 1: encrypt=true, trustServerCertificate=true (chuẩn đồng bộ với persistence.xml cho JPA/Hibernate)
+    private static final String URL_ENCRYPT =
+            "jdbc:sqlserver://" + SERVER + ":" + PORT + ";"
+          + "databaseName=" + DATABASE + ";"
+          + "encrypt=true;"
+          + "trustServerCertificate=true;";
+
+    // URL 2: encrypt=false, trustServerCertificate=true (dành cho các bản SQL Server cũ không bật SSL)
+    private static final String URL_NO_ENCRYPT =
             "jdbc:sqlserver://" + SERVER + ":" + PORT + ";"
           + "databaseName=" + DATABASE + ";"
           + "encrypt=false;"
           + "trustServerCertificate=true;";
 
-    /**
-     * Trả về một Connection đến SQL Server
-     * Dùng trong try-with-resources để tự đóng sau khi xong
-     *
-     * Ví dụ sử dụng:
-     *   try (Connection conn = DBConnection.getConnection()) {
-     *       // dùng conn ở đây
-     *   }
-     */
     public static Connection getConnection() throws SQLException {
         try {
-            // Load driver thủ công - bắt buộc với Tomcat 10+
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
         } catch (ClassNotFoundException e) {
             throw new SQLException("Không tìm thấy SQL Server JDBC Driver", e);
         }
-        return DriverManager.getConnection(URL, USERNAME, PASSWORD);
+
+        // Ưu tiên kết nối bảo mật trước (khớp với persistence.xml)
+        try {
+            return DriverManager.getConnection(URL_ENCRYPT, USERNAME, PASSWORD);
+        } catch (SQLException e) {
+            // Nếu lỗi mã hóa, thử lại với URL không bắt buộc mã hóa
+            try {
+                return DriverManager.getConnection(URL_NO_ENCRYPT, USERNAME, PASSWORD);
+            } catch (SQLException ex) {
+                System.err.println("[DBConnection ERROR] Kết nối CSDL thất bại cả 2 phương thức: " + ex.getMessage());
+                throw ex;
+            }
+        }
     }
 }

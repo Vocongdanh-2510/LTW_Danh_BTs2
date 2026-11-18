@@ -49,10 +49,15 @@ public class UserDaoImpl implements UserDao {
     // ─── GET BY USERNAME ─────────────────────────────────────
     @Override
     public User get(String username) {
-        String sql = "SELECT * FROM users WHERE username = ?";
+        if (username == null) return null;
+        String trimmed = username.trim();
+        // Cho phép tìm theo username HOẶC email
+        String sql = "SELECT * FROM users WHERE LOWER(LTRIM(RTRIM(username))) = LOWER(?) "
+                   + "OR LOWER(LTRIM(RTRIM(email))) = LOWER(?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, username);
+            ps.setString(1, trimmed);
+            ps.setString(2, trimmed);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return extractUserFromResultSet(rs);
@@ -67,10 +72,15 @@ public class UserDaoImpl implements UserDao {
     // ─── GET BY EMAIL ────────────────────────────────────────
     @Override
     public User getByEmail(String email) {
-        String sql = "SELECT * FROM users WHERE email = ?";
+        if (email == null) return null;
+        String trimmed = email.trim();
+        // Cho phép tìm theo email HOẶC username để thuận tiện tối đa cho người dùng
+        String sql = "SELECT * FROM users WHERE LOWER(LTRIM(RTRIM(email))) = LOWER(?) "
+                   + "OR LOWER(LTRIM(RTRIM(username))) = LOWER(?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, email);
+            ps.setString(1, trimmed);
+            ps.setString(2, trimmed);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return extractUserFromResultSet(rs);
@@ -127,52 +137,102 @@ public class UserDaoImpl implements UserDao {
     // ─── UPDATE PASSWORD ─────────────────────────────────────
     @Override
     public boolean updatePassword(String email, String newPassword) {
-        String sql = "UPDATE users SET password = ?, code = NULL WHERE email = ?";
+        if (email == null || newPassword == null) return false;
+        String trimmed = email.trim();
+        boolean success = false;
+
+        // 1. Cập nhật qua JDBC PreparedStatement (bảo vệ bằng LOWER, LTRIM, RTRIM)
+        String sql = "UPDATE users SET password = ?, code = NULL "
+                   + "WHERE LOWER(LTRIM(RTRIM(email))) = LOWER(?) "
+                   + "   OR LOWER(LTRIM(RTRIM(username))) = LOWER(?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, newPassword);
-            ps.setString(2, email);
+            ps.setString(2, trimmed);
+            ps.setString(3, trimmed);
             int rows = ps.executeUpdate();
-            return rows > 0;
+            System.out.println("[DEBUG UserDaoImpl] updatePassword cho '" + trimmed + "' - Số dòng ảnh hưởng: " + rows);
+            if (rows > 0) {
+                success = true;
+            }
         } catch (Exception e) {
-            // Fallback nếu cột code chưa có
-            String sqlFallback = "UPDATE users SET password = ? WHERE email = ?";
+            System.err.println("[ERROR UserDaoImpl] JDBC updatePassword gặp lỗi: " + e.getMessage());
+            // Fallback nếu bảng chưa có cột code
+            String sqlFallback = "UPDATE users SET password = ? WHERE LOWER(LTRIM(RTRIM(email))) = LOWER(?) OR LOWER(LTRIM(RTRIM(username))) = LOWER(?)";
             try (Connection conn = DBConnection.getConnection();
                  PreparedStatement ps = conn.prepareStatement(sqlFallback)) {
                 ps.setString(1, newPassword);
-                ps.setString(2, email);
-                return ps.executeUpdate() > 0;
+                ps.setString(2, trimmed);
+                ps.setString(3, trimmed);
+                int rows = ps.executeUpdate();
+                if (rows > 0) success = true;
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
-        return false;
+
+        // 2. Đồng thời cập nhật qua JPA (Hibernate) để đảm bảo đồng bộ hoàn toàn với Persistence Context
+        try {
+            jakarta.persistence.EntityManager em = vn.iotstar.config.JpaConfig.getEntityManager();
+            jakarta.persistence.EntityTransaction trans = em.getTransaction();
+            try {
+                trans.begin();
+                jakarta.persistence.Query q = em.createQuery(
+                    "UPDATE User u SET u.password = :pwd, u.code = NULL " +
+                    "WHERE LOWER(TRIM(u.email)) = LOWER(:id) OR LOWER(TRIM(u.username)) = LOWER(:id)");
+                q.setParameter("pwd", newPassword);
+                q.setParameter("id", trimmed);
+                int count = q.executeUpdate();
+                trans.commit();
+                System.out.println("[DEBUG JPA] updatePassword JPA EntityManager - Số dòng ảnh hưởng: " + count);
+                if (count > 0) success = true;
+            } catch (Exception ex) {
+                if (trans.isActive()) trans.rollback();
+            } finally {
+                em.close();
+            }
+        } catch (Throwable t) {
+            // Không ngắt tiến trình nếu JPA đã đồng bộ xong
+        }
+
+        return success;
     }
 
     // ─── ACTIVATE USER ───────────────────────────────────────
     @Override
     public boolean activateUser(String email) {
-        String sql = "UPDATE users SET status = 1, code = NULL WHERE email = ?";
+        if (email == null) return false;
+        String trimmed = email.trim();
+        String sql = "UPDATE users SET status = 1, code = NULL "
+                   + "WHERE LOWER(LTRIM(RTRIM(email))) = LOWER(?) "
+                   + "   OR LOWER(LTRIM(RTRIM(username))) = LOWER(?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, email);
+            ps.setString(1, trimmed);
+            ps.setString(2, trimmed);
             int rows = ps.executeUpdate();
             return rows > 0;
         } catch (Exception e) {
             e.printStackTrace();
-            return true; // Nếu DB không có cột status thì coi như thành công
+            return true;
         }
     }
 
     // ─── UPDATE CODE ─────────────────────────────────────────
     @Override
     public boolean updateCode(String email, String code) {
-        String sql = "UPDATE users SET code = ? WHERE email = ?";
+        if (email == null) return false;
+        String trimmed = email.trim();
+        String sql = "UPDATE users SET code = ? "
+                   + "WHERE LOWER(LTRIM(RTRIM(email))) = LOWER(?) "
+                   + "   OR LOWER(LTRIM(RTRIM(username))) = LOWER(?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, code);
-            ps.setString(2, email);
+            ps.setString(2, trimmed);
+            ps.setString(3, trimmed);
             int rows = ps.executeUpdate();
+            System.out.println("[DEBUG UserDaoImpl] updateCode OTP cho '" + trimmed + "' - Số dòng ảnh hưởng: " + rows);
             return rows > 0;
         } catch (Exception e) {
             e.printStackTrace();

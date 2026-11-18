@@ -55,21 +55,21 @@ public class WaitingController extends HttpServlet {
             }
         }
 
-        // ── Có User -> phân quyền theo roleid
+        // ── Có User -> phân quyền theo roleid chuẩn xác
         if (u != null) {
             req.setAttribute("username", u.getUserName());
 
             if (u.getRoleid() == 1) {
-                // Admin
-                resp.sendRedirect(req.getContextPath() + "/admin/category/list");
+                // Admin (Quản trị viên): toàn quyền hệ thống, điều hướng về Trang chủ /home
+                resp.sendRedirect(req.getContextPath() + "/home");
 
             } else if (u.getRoleid() == 2) {
-                // Manager
-                resp.sendRedirect(req.getContextPath() + "/manager/home");
+                // Manager (Quản lý nội dung): điều hướng về trang quản lý Videos
+                resp.sendRedirect(req.getContextPath() + "/admin/videos");
 
             } else {
-                // User thường
-                resp.sendRedirect(req.getContextPath() + "/user/home");
+                // User thường (roleid = 5): điều hướng về Trang chủ xem video
+                resp.sendRedirect(req.getContextPath() + "/home");
             }
 
         } else {

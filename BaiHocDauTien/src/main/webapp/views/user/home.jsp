@@ -165,6 +165,15 @@
                             <td><span class="badge">User</span></td>
                         </tr>
                     </table>
+
+                    <div style="margin-top: 25px; display: flex; gap: 12px; flex-wrap: wrap;">
+                        <a href="${pageContext.request.contextPath}/home" style="display:inline-block;padding:10px 20px;background:#1a2942;color:#fff;text-decoration:none;border-radius:4px;font-size:0.85rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
+                            Trang Chủ Video (/home)
+                        </a>
+                        <a href="${pageContext.request.contextPath}/video" style="display:inline-block;padding:10px 20px;background:#0284c7;color:#fff;text-decoration:none;border-radius:4px;font-size:0.85rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
+                            Xem Tất Cả Video (/video)
+                        </a>
+                    </div>
                 </div>
             </main>
 

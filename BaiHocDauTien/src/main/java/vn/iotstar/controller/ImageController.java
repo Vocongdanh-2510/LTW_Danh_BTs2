@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import vn.iotstar.utils.constants;
 
-@WebServlet(urlPatterns = { "/image", "/img" })
+@WebServlet(urlPatterns = { "/image", "/img", "/video/stream", "/media" })
 public class ImageController extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
@@ -64,6 +64,10 @@ public class ImageController extends HttpServlet {
             case "svg"  -> resp.setContentType("image/svg+xml");
             case "gif"  -> resp.setContentType("image/gif");
             case "webp" -> resp.setContentType("image/webp");
+            case "mp4"  -> resp.setContentType("video/mp4");
+            case "webm" -> resp.setContentType("video/webm");
+            case "ogg"  -> resp.setContentType("video/ogg");
+            case "mov"  -> resp.setContentType("video/quicktime");
             default     -> resp.setContentType("application/octet-stream");
         }
 

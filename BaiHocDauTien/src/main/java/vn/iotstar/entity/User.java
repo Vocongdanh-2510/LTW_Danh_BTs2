@@ -45,6 +45,10 @@ public class User implements Serializable {
     @Column(name = "code", columnDefinition = "NVARCHAR(20) NULL")
     private String code;
 
+    // bi-directional many-to-one association to Video (Quan hệ 1-n: 1 User có nhiều Video)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private java.util.List<Video> videos = new java.util.ArrayList<>();
+
     public User() {
     }
 
@@ -171,5 +175,30 @@ public class User implements Serializable {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public java.util.List<Video> getVideos() {
+        return this.videos;
+    }
+
+    public void setVideos(java.util.List<Video> videos) {
+        this.videos = videos;
+    }
+
+    public Video addVideo(Video video) {
+        if (getVideos() == null) {
+            this.videos = new java.util.ArrayList<>();
+        }
+        getVideos().add(video);
+        video.setUser(this);
+        return video;
+    }
+
+    public Video removeVideo(Video video) {
+        if (getVideos() != null) {
+            getVideos().remove(video);
+        }
+        video.setUser(null);
+        return video;
     }
 }

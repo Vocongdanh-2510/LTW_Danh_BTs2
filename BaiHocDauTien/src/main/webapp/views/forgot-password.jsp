@@ -179,9 +179,12 @@
 
             <form action="${pageContext.request.contextPath}/forgot-password" method="post">
                 <div class="field">
-                    <label for="email">Địa chỉ Email</label>
-                    <input type="email" id="email" name="email" value="${email}"
-                           placeholder="Nhập email của bạn (vd: user@gmail.com)" required autofocus>
+                    <label for="email">Địa chỉ Email hoặc Tên đăng nhập</label>
+                    <input type="text" id="email" name="email" value="${email}"
+                           placeholder="Nhập email (vd: admin@gmail.com) hoặc username" required autofocus>
+                    <small style="display:block; margin-top: 6px; color: #888; font-size: 0.8rem;">
+                        * Mã OTP 6 số sẽ được gửi tới email và hiển thị tại console Server Tomcat.
+                    </small>
                 </div>
 
                 <button type="submit" class="btn-submit">Gửi mã xác nhận OTP</button>

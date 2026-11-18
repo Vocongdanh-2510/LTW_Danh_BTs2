@@ -11,12 +11,25 @@ import java.util.Random;
  */
 public class EmailUtil {
 
-    // Cấu hình tài khoản gửi Email (có thể đổi sang tài khoản của bạn)
+    // Cấu hình tài khoản gửi Email qua Google SMTP
     public static final String SMTP_HOST = "smtp.gmail.com";
     public static final String SMTP_PORT = "587";
-    public static final String SENDER_EMAIL = "vocongdanh01w2@gmail.com";
-    // Mật khẩu ứng dụng (App Password) 16 ký tự của Gmail nếu có
-    public static final String SENDER_PASSWORD = "your-app-password";
+    public static String SENDER_EMAIL = "vocongdanh01w2@gmail.com";
+    
+    // Mật khẩu ứng dụng (App Password 16 chữ cái) của Gmail
+    // Có thể cấu hình trực tiếp ở đây hoặc qua biến môi trường GMAIL_APP_PASSWORD
+    public static String SENDER_PASSWORD = "your-app-password";
+
+    /**
+     * Lấy mật khẩu app thực tế (ưu tiên biến môi trường hoặc biến static)
+     */
+    public static String getAppPassword() {
+        String envPass = System.getenv("GMAIL_APP_PASSWORD");
+        if (envPass != null && !envPass.trim().isEmpty()) {
+            return envPass.trim();
+        }
+        return SENDER_PASSWORD;
+    }
 
     /**
      * Sinh mã OTP ngẫu nhiên gồm 6 chữ số
@@ -41,64 +54,65 @@ public class EmailUtil {
         // In mã OTP ra Server Console rõ ràng
         System.out.println("========================================================================");
         System.out.println("[EMAIL NOTIFICATION - OTP SYSTEM]");
-        System.out.println(" -> Đến email:  " + toEmail);
-        System.out.println(" -> Tiêu đề:   " + subject);
-        System.out.println(" -> MÃ OTP:     >>> " + otp + " <<<");
-        System.out.println(" -> Thời hạn:   5 phút kể từ lúc gửi");
+        System.out.println(" -> Đến email / tài khoản: " + toEmail);
+        System.out.println(" -> Tiêu đề:             " + subject);
+        System.out.println(" -> MÃ OTP:               >>> " + otp + " <<<");
+        System.out.println(" -> Thời hạn hiệu lực:    5 phút kể từ lúc gửi");
         System.out.println("========================================================================");
 
         // Nội dung HTML của email
-        String content = "<div style='font-family: Arial, sans-serif; max-width: 500px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;'>"
-                + "<h2 style='color: #111; text-align: center; border-bottom: 2px solid #111; padding-bottom: 10px;'>" + subject + "</h2>"
-                + "<p>Xin chào,</p>"
-                + "<p>Hệ thống nhận được yêu cầu xác thực tài khoản từ bạn. Vui lòng nhập mã OTP bên dưới:</p>"
-                + "<div style='background: #f4f6f8; padding: 15px; text-align: center; font-size: 28px; font-weight: bold; letter-spacing: 6px; color: #1a2942; border-radius: 6px; margin: 20px 0;'>"
+        String content = "<div style='font-family: Arial, sans-serif; max-width: 500px; margin: auto; padding: 25px; border: 1px solid #e1e4e8; border-radius: 10px; background-color: #ffffff;'>"
+                + "<h2 style='color: #111; text-align: center; border-bottom: 2px solid #111; padding-bottom: 15px; margin-top: 0;'>" + subject + "</h2>"
+                + "<p style='font-size: 15px; color: #333;'>Xin chào <b>" + toEmail + "</b>,</p>"
+                + "<p style='font-size: 14px; color: #555;'>Hệ thống nhận được yêu cầu xác thực tài khoản từ bạn. Vui lòng sử dụng mã OTP dưới đây để hoàn tất:</p>"
+                + "<div style='background: #f6f8fa; padding: 18px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #0969da; border: 1px dashed #0969da; border-radius: 8px; margin: 25px 0;'>"
                 + otp + "</div>"
-                + "<p style='color: #e74c3c; font-size: 13px;'>* Lưu ý: Mã này có hiệu lực trong vòng <b>5 phút</b>. Không chia sẻ mã này cho bất kỳ ai.</p>"
-                + "<hr style='border: none; border-top: 1px solid #eee; margin-top: 25px;'/>"
-                + "<p style='font-size: 12px; color: #888; text-align: center;'>Hệ thống Lập Trình Web - Sinh viên Võ Công Danh (24110010)</p>"
+                + "<p style='color: #cf222e; font-size: 13px;'>* <b>Lưu ý:</b> Mã xác nhận này có hiệu lực trong vòng <b>5 phút</b>. Tuyệt đối không chia sẻ mã này cho bất kỳ ai.</p>"
+                + "<hr style='border: none; border-top: 1px solid #eaecef; margin-top: 25px;'/>"
+                + "<p style='font-size: 12px; color: #6e7781; text-align: center; margin-bottom: 0;'>Hệ thống Lập Trình Web - Sinh viên Võ Công Danh (MSSV: 24110010)</p>"
                 + "</div>";
 
-        // Thử gửi qua Jakarta Mail nếu đã nạp thư viện và có cấu hình mạng
-        try {
-            // Kiểm tra xem class Jakarta Mail có sẵn không
-            Class.forName("jakarta.mail.Session");
+        String activePassword = getAppPassword();
 
-            Properties props = new Properties();
-            props.put("mail.smtp.auth", "true");
-            props.put("mail.smtp.starttls.enable", "true");
-            props.put("mail.smtp.host", SMTP_HOST);
-            props.put("mail.smtp.port", SMTP_PORT);
-            props.put("mail.smtp.ssl.protocols", "TLSv1.2");
+        // Thử gửi qua Jakarta Mail nếu đã có cấu hình App Password hợp lệ
+        if (activePassword != null && !activePassword.trim().isEmpty() && !activePassword.equals("your-app-password")) {
+            try {
+                Properties props = new Properties();
+                props.put("mail.smtp.auth", "true");
+                props.put("mail.smtp.starttls.enable", "true");
+                props.put("mail.smtp.starttls.required", "true");
+                props.put("mail.smtp.host", SMTP_HOST);
+                props.put("mail.smtp.port", SMTP_PORT);
+                props.put("mail.smtp.ssl.protocols", "TLSv1.2 TLSv1.3");
+                props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+                props.put("mail.smtp.connectiontimeout", "6000");
+                props.put("mail.smtp.timeout", "6000");
+                props.put("mail.smtp.writetimeout", "6000");
 
-            jakarta.mail.Session session = jakarta.mail.Session.getInstance(props, new jakarta.mail.Authenticator() {
-                @Override
-                protected jakarta.mail.PasswordAuthentication getPasswordAuthentication() {
-                    return new jakarta.mail.PasswordAuthentication(SENDER_EMAIL, SENDER_PASSWORD);
-                }
-            });
+                jakarta.mail.Session session = jakarta.mail.Session.getInstance(props, new jakarta.mail.Authenticator() {
+                    @Override
+                    protected jakarta.mail.PasswordAuthentication getPasswordAuthentication() {
+                        return new jakarta.mail.PasswordAuthentication(SENDER_EMAIL, activePassword);
+                    }
+                });
 
-            jakarta.mail.internet.MimeMessage message = new jakarta.mail.internet.MimeMessage(session);
-            message.setFrom(new jakarta.mail.internet.InternetAddress(SENDER_EMAIL, "Webst2 - Vo Cong Danh"));
-            message.setRecipient(jakarta.mail.Message.RecipientType.TO, new jakarta.mail.internet.InternetAddress(toEmail));
-            message.setSubject(subject, "UTF-8");
-            message.setContent(content, "text/html; charset=UTF-8");
+                jakarta.mail.internet.MimeMessage message = new jakarta.mail.internet.MimeMessage(session);
+                message.setFrom(new jakarta.mail.internet.InternetAddress(SENDER_EMAIL, "Hệ Thống Lập Trình Web - Võ Công Danh"));
+                message.setRecipient(jakarta.mail.Message.RecipientType.TO, new jakarta.mail.internet.InternetAddress(toEmail));
+                message.setSubject(subject, "UTF-8");
+                message.setContent(content, "text/html; charset=UTF-8");
 
-            // Chỉ gửi nếu không phải placeholder
-            if (!SENDER_PASSWORD.equals("your-app-password")) {
                 jakarta.mail.Transport.send(message);
-                System.out.println("[EMAIL SUCCESS] Đã gửi email thực tế đến: " + toEmail);
-            } else {
-                System.out.println("[EMAIL INFO] Chưa cấu hình SENDER_PASSWORD thực tế. Mã OTP đã sẵn sàng trên Console.");
+                System.out.println("[EMAIL SUCCESS] Đã gửi email thực tế thành công đến hòm thư: " + toEmail);
+            } catch (Throwable e) {
+                System.err.println("[EMAIL WARNING] Không thể gửi email qua Gmail SMTP (" + e.getMessage() + ").");
+                System.out.println("[EMAIL INFO] Bạn có thể lấy mã OTP trực tiếp từ Console ở trên: " + otp);
             }
-            return true;
-        } catch (ClassNotFoundException e) {
-            System.out.println("[EMAIL INFO] Thư viện Jakarta Mail chưa được tải trong môi trường này. Mã OTP đã được in ra console.");
-            return true;
-        } catch (Throwable e) {
-            System.out.println("[EMAIL NOTICE] Gửi email qua mạng không thành công (" + e.getMessage() + ").");
-            System.out.println("[EMAIL NOTICE] Dùng mã OTP trên Console server: " + otp);
-            return true;
+        } else {
+            System.out.println("[EMAIL INFO] SENDER_PASSWORD hiện tại là mặc định (chưa gắn 16 chữ cái App Password Gmail).");
+            System.out.println("[EMAIL INFO] Đã in mã OTP ra Console server để test trực tiếp: " + otp);
         }
+
+        return true;
     }
 }
