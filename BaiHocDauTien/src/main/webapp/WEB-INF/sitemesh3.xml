@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemesh>
+    <!-- Loại trừ tài nguyên tĩnh và servlet đọc hình ảnh -->
+    <mapping path="/images/*" exclude="true" />
+    <mapping path="/assets/*" exclude="true" />
+    <mapping path="/image" exclude="true" />
+    <mapping path="/image/*" exclude="true" />
+    <mapping path="/css/*" exclude="true" />
+    <mapping path="/js/*" exclude="true" />
+
+    <!-- Quản lý giao diện Admin -->
+    <mapping path="/admin/*" decorator="/decorators/admin.jsp" />
+    <mapping path="/admin" decorator="/decorators/admin.jsp" />
+
+    <!-- Quản lý giao diện Người dùng / Public chung -->
+    <mapping path="/*" decorator="/decorators/web.jsp" />
+</sitemesh>
