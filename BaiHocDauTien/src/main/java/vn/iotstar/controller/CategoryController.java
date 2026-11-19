@@ -90,6 +90,21 @@ public class CategoryController extends HttpServlet {
             int status = (statusStr != null && !statusStr.isEmpty()) ? Integer.parseInt(statusStr) : 1;
             String images = req.getParameter("images");
 
+            if (categoryname != null) categoryname = categoryname.trim();
+
+            // Validation Form Thêm Category
+            if (Utils.ValidationUtil.isEmpty(categoryname)) {
+                req.setAttribute("error", "Tên danh mục không được để trống!");
+                req.setAttribute("categoryname", categoryname);
+                req.getRequestDispatcher("/views/admin/category-add.jsp").forward(req, resp);
+                return;
+            } else if (!Utils.ValidationUtil.isValidLength(categoryname, 2, 100)) {
+                req.setAttribute("error", "Tên danh mục phải có từ 2 đến 100 ký tự!");
+                req.setAttribute("categoryname", categoryname);
+                req.getRequestDispatcher("/views/admin/category-add.jsp").forward(req, resp);
+                return;
+            }
+
             // đưa dữ liệu vào model
             Category category = new Category();
             category.setCategoryname(categoryname);
@@ -133,12 +148,27 @@ public class CategoryController extends HttpServlet {
             int status = (statusStr != null && !statusStr.isEmpty()) ? Integer.parseInt(statusStr) : 1;
             String images = req.getParameter("images");
 
-            // đưa dữ liệu vào model
+            if (categoryname != null) categoryname = categoryname.trim();
+
             Category category = cateService.findById(categoryid);
             if (category == null) {
                 category = new Category();
                 category.setCategoryId(categoryid);
             }
+
+            // Validation Form Chỉnh sửa Category
+            if (Utils.ValidationUtil.isEmpty(categoryname)) {
+                req.setAttribute("error", "Tên danh mục không được để trống!");
+                req.setAttribute("cate", category);
+                req.getRequestDispatcher("/views/admin/category-edit.jsp").forward(req, resp);
+                return;
+            } else if (!Utils.ValidationUtil.isValidLength(categoryname, 2, 100)) {
+                req.setAttribute("error", "Tên danh mục phải có từ 2 đến 100 ký tự!");
+                req.setAttribute("cate", category);
+                req.getRequestDispatcher("/views/admin/category-edit.jsp").forward(req, resp);
+                return;
+            }
+
             String fileold = category.getImages();
             category.setCategoryname(categoryname);
             category.setStatus(status);

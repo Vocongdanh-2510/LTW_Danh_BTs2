@@ -4,107 +4,162 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thêm Video Mới - Admin | Võ Công Danh</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 30px; background-color: #f4f6f9; color: #333; }
-        .form-container { max-width: 680px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        h2 { color: #2c3e50; margin-top: 0; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; font-weight: 600; margin-bottom: 6px; }
-        input[type="text"], select, textarea { width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box; font-family: inherit; }
-        input[type="file"] { width: 100%; padding: 8px; border: 1px dashed #ced4da; border-radius: 4px; background: #fafafa; }
-        .hint { font-size: 0.8rem; color: #6c757d; margin-top: 4px; }
-        .radio-group { display: flex; align-items: center; gap: 15px; margin-top: 5px; }
-        .radio-group label { font-weight: normal; margin-bottom: 0; cursor: pointer; }
-        .btn-submit { background-color: #28a745; color: white; padding: 10px 22px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 15px; }
-        .btn-submit:hover { background-color: #218838; }
-        .btn-back { display: inline-block; margin-left: 12px; color: #6c757d; text-decoration: none; }
-        .btn-back:hover { text-decoration: underline; }
-    </style>
+    <title>Thêm Video Mới - Admin Panel</title>
 </head>
 <body>
-<div class="form-container">
-    <h2>Thêm Video Mới (Multipart Upload &amp; JPA)</h2>
-    <hr style="margin-bottom: 25px;">
-
-    <form action="<c:url value='/admin/video/insert'/>" method="post" enctype="multipart/form-data">
-        
-        <div class="form-group">
-            <label for="videoId">Mã Video (Video ID):</label>
-            <input type="text" id="videoId" name="videoId" placeholder="VD: V01, VID01 (để trống sẽ tự sinh)...">
-            <div class="hint">Khóa chính (Primary Key) của bảng Videos.</div>
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2"><i class="fa-solid fa-square-plus text-success me-2"></i>Thêm Video Mới</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="<c:url value='/admin/videos'/>" class="btn btn-outline-secondary btn-sm">
+                <i class="fa-solid fa-arrow-left me-1"></i>Quay lại danh sách
+            </a>
         </div>
+    </div>
 
-        <div class="form-group">
-            <label for="title">Tiêu đề video (*):</label>
-            <input type="text" id="title" name="title" required placeholder="Nhập tiêu đề video...">
-        </div>
+    <div class="row">
+        <div class="col-lg-9">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
 
-        <div class="form-group">
-            <label for="categoryId">Danh mục (Category):</label>
-            <select id="categoryId" name="categoryId">
-                <option value="">-- Chọn danh mục (tùy chọn) --</option>
-                <c:forEach items="${cateList}" var="c">
-                    <option value="${c.categoryId}">${c.categoryname}</option>
-                </c:forEach>
-            </select>
-        </div>
+                    <c:if test="${not empty error}">
+                        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center" role="alert">
+                            <i class="fa-solid fa-triangle-exclamation me-2 fs-5"></i>
+                            <div>${error}</div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    </c:if>
 
-        <div class="form-group">
-            <label for="userId">Người đăng (User - Quan hệ 1-n) (*):</label>
-            <select id="userId" name="userId" required>
-                <c:forEach items="${userList}" var="u">
-                    <option value="${u.id}">${u.fullname != null ? u.fullname : u.username} (${u.username} - ID: ${u.id})</option>
-                </c:forEach>
-            </select>
-            <div class="hint">Mối quan hệ 1-n: 1 User sở hữu nhiều Video trong CSDL.</div>
-        </div>
+                    <form action="<c:url value='/admin/video/insert'/>" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="videoId" class="form-label fw-semibold">
+                                    Mã Video (Video ID)
+                                </label>
+                                <input type="text"
+                                       class="form-control"
+                                       id="videoId"
+                                       name="videoId"
+                                       value="${videoId}"
+                                       placeholder="VD: VID01 (để trống sẽ tự sinh mã)">
+                                <div class="form-text">Khóa chính (Primary Key) duy nhất của Video.</div>
+                            </div>
 
-        <div class="form-group">
-            <label for="poster">Link ảnh Poster (URL):</label>
-            <input type="text" id="poster" name="poster" placeholder="https://example.com/poster.jpg">
-        </div>
+                            <div class="col-md-6">
+                                <label for="title" class="form-label fw-semibold">
+                                    Tiêu đề video (*)
+                                </label>
+                                <input type="text"
+                                       class="form-control ${not empty error ? 'is-invalid' : ''}"
+                                       id="title"
+                                       name="title"
+                                       value="${title}"
+                                       placeholder="Nhập tiêu đề video..."
+                                       minlength="3"
+                                       maxlength="200"
+                                       required autofocus>
+                                <div class="invalid-feedback">
+                                    Tiêu đề video bắt buộc có từ 3 đến 200 ký tự.
+                                </div>
+                            </div>
+                        </div>
 
-        <div class="form-group">
-            <label for="posterFile">Hoặc Upload ảnh Poster (từ máy tính - Multipart):</label>
-            <input type="file" id="posterFile" name="posterFile" accept="image/*">
-        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="categoryId" class="form-label fw-semibold">Danh mục (Category)</label>
+                                <select class="form-select" id="categoryId" name="categoryId">
+                                    <option value="">-- Chọn danh mục (tùy chọn) --</option>
+                                    <c:forEach items="${cateList}" var="c">
+                                        <option value="${c.categoryId}" ${categoryId == c.categoryId ? 'selected' : ''}>
+                                            ${c.categoryname}
+                                        </option>
+                                    </c:forEach>
+                                </select>
+                            </div>
 
-        <div class="form-group">
-            <label for="url">Link Video (YouTube hoặc MP4 trực tiếp):</label>
-            <input type="text" id="url" name="url" placeholder="VD: https://www.youtube.com/watch?v=... hoặc link mp4">
-            <div class="hint">Hỗ trợ tự động nhúng YouTube Player hoặc phát file MP4.</div>
-        </div>
+                            <div class="col-md-6">
+                                <label for="userId" class="form-label fw-semibold">Người đăng (User - Quan hệ 1-n) (*)</label>
+                                <select class="form-select" id="userId" name="userId" required>
+                                    <c:forEach items="${userList}" var="u">
+                                        <option value="${u.id}" ${userId == u.id ? 'selected' : ''}>
+                                            ${u.fullname != null ? u.fullname : u.username} (${u.username} - ID: ${u.id})
+                                        </option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+                        </div>
 
-        <div class="form-group">
-            <label for="videoFile">Hoặc Upload File Video MP4 (từ máy tính - Multipart):</label>
-            <input type="file" id="videoFile" name="videoFile" accept="video/mp4,video/webm,video/*">
-            <div class="hint">Tập tin sẽ được xử lý lưu trữ qua Servlet MultipartConfig theo giáo trình HCMUTE.</div>
-        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label fw-semibold">Mô tả video</label>
+                            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Nhập tóm tắt hoặc nội dung chi tiết...">${description}</textarea>
+                        </div>
 
-        <div class="form-group">
-            <label for="description">Mô tả video:</label>
-            <textarea id="description" name="description" rows="4" placeholder="Nhập mô tả chi tiết nội dung video..."></textarea>
-        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="poster" class="form-label fw-semibold">Link ảnh Poster (URL)</label>
+                                <input type="text" class="form-control" id="poster" name="poster" value="${poster}" placeholder="https://example.com/poster.jpg">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="posterFile" class="form-label fw-semibold">Upload file ảnh Poster</label>
+                                <input type="file" class="form-control" id="posterFile" name="posterFile" accept="image/*">
+                            </div>
+                        </div>
 
-        <div class="form-group">
-            <label>Trạng thái (Active):</label>
-            <div class="radio-group">
-                <label>
-                    <input type="radio" name="active" value="1" checked> Hoạt động
-                </label>
-                <label>
-                    <input type="radio" name="active" value="0"> Khóa
-                </label>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="url" class="form-label fw-semibold">Link Video (YouTube hoặc URL)</label>
+                                <input type="text" class="form-control" id="url" name="url" value="${url}" placeholder="https://www.youtube.com/watch?v=...">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="videoFile" class="form-label fw-semibold">Upload file Video (mp4, mkv)</label>
+                                <input type="file" class="form-control" id="videoFile" name="videoFile" accept="video/*">
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold d-block">Trạng thái phát hành</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="activeOn" name="active" value="1" checked>
+                                <label class="form-check-label text-success fw-semibold" for="activeOn">
+                                    <i class="fa-solid fa-circle-check me-1"></i>Công khai (Active)
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="activeOff" name="active" value="0">
+                                <label class="form-check-label text-secondary fw-semibold" for="activeOff">
+                                    <i class="fa-solid fa-eye-slash me-1"></i>Ẩn (Private)
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success px-4 fw-semibold">
+                                <i class="fa-solid fa-floppy-disk me-1"></i>Lưu Video (Insert)
+                            </button>
+                            <a class="btn btn-light border px-4" href="<c:url value='/admin/videos'/>">
+                                Hủy bỏ
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
+    </div>
 
-        <div style="margin-top: 30px;">
-            <input type="submit" class="btn-submit" value="Lưu Video">
-            <a class="btn-back" href="<c:url value='/admin/videos'/>">← Quay lại danh sách</a>
-        </div>
-    </form>
-</div>
+    <script>
+        (function () {
+            'use strict';
+            var forms = document.querySelectorAll('.needs-validation');
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+    </script>
 </body>
 </html>

@@ -74,10 +74,28 @@ public class login_controller extends HttpServlet {
         if (username != null) username = username.trim();
         if (password != null) password = password.trim();
 
-        // Validate: không được để trống
-        if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
-            alertMsg = "Tài khoản hoặc mật khẩu không được rỗng";
-            req.setAttribute("alert", alertMsg);
+        req.setAttribute("username", username);
+
+        // Validation phía Server cho Login Form
+        boolean hasError = false;
+        if (Utils.ValidationUtil.isEmpty(username)) {
+            req.setAttribute("errorUsername", "Tên đăng nhập không được để trống!");
+            hasError = true;
+        } else if (username.length() < 3) {
+            req.setAttribute("errorUsername", "Tên đăng nhập phải có ít nhất 3 ký tự!");
+            hasError = true;
+        }
+
+        if (Utils.ValidationUtil.isEmpty(password)) {
+            req.setAttribute("errorPassword", "Mật khẩu không được để trống!");
+            hasError = true;
+        } else if (!Utils.ValidationUtil.isValidPassword(password)) {
+            req.setAttribute("errorPassword", "Mật khẩu phải có ít nhất 6 ký tự!");
+            hasError = true;
+        }
+
+        if (hasError) {
+            req.setAttribute("alert", "Vui lòng kiểm tra lại thông tin đăng nhập!");
             req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
             return;
         }

@@ -139,10 +139,43 @@ public class VideoAdminController extends HttpServlet {
             String categoryIdStr = req.getParameter("categoryId");
             String userIdStr = req.getParameter("userId");
 
-            if (videoId == null || videoId.trim().isEmpty()) {
-                videoId = "VID" + System.currentTimeMillis();
-            } else {
+            if (title != null) title = title.trim();
+
+            // Validation Form Thêm Video
+            boolean hasError = false;
+            String errorMsg = "";
+
+            if (Utils.ValidationUtil.isEmpty(title)) {
+                errorMsg = "Tiêu đề video không được để trống!";
+                hasError = true;
+            } else if (!Utils.ValidationUtil.isValidLength(title, 3, 200)) {
+                errorMsg = "Tiêu đề video phải có từ 3 đến 200 ký tự!";
+                hasError = true;
+            }
+
+            if (videoId != null && !videoId.trim().isEmpty()) {
                 videoId = videoId.trim();
+                if (videoService.findById(videoId) != null) {
+                    errorMsg = "Mã Video '" + videoId + "' đã tồn tại trong hệ thống!";
+                    hasError = true;
+                }
+            } else {
+                videoId = "VID" + System.currentTimeMillis();
+            }
+
+            if (hasError) {
+                req.setAttribute("error", errorMsg);
+                req.setAttribute("videoId", videoId);
+                req.setAttribute("title", title);
+                req.setAttribute("description", description);
+                req.setAttribute("poster", posterUrl);
+                req.setAttribute("url", videoUrl);
+                req.setAttribute("categoryId", categoryIdStr);
+                req.setAttribute("userId", userIdStr);
+                req.setAttribute("cateList", cateService.findAll());
+                req.setAttribute("userList", userService.findAll());
+                req.getRequestDispatcher("/views/admin/video-add.jsp").forward(req, resp);
+                return;
             }
 
             Video video = new Video();
@@ -240,11 +273,30 @@ public class VideoAdminController extends HttpServlet {
             String categoryIdStr = req.getParameter("categoryId");
             String userIdStr = req.getParameter("userId");
 
+            if (title != null) title = title.trim();
+
             Video video = videoService.findById(videoId);
             if (video == null) {
                 video = new Video();
                 video.setVideoId(videoId);
                 video.setCreatedDate(new Date());
+            }
+
+            // Validation Form Chỉnh sửa Video
+            if (Utils.ValidationUtil.isEmpty(title)) {
+                req.setAttribute("error", "Tiêu đề video không được để trống!");
+                req.setAttribute("video", video);
+                req.setAttribute("cateList", cateService.findAll());
+                req.setAttribute("userList", userService.findAll());
+                req.getRequestDispatcher("/views/admin/video-edit.jsp").forward(req, resp);
+                return;
+            } else if (!Utils.ValidationUtil.isValidLength(title, 3, 200)) {
+                req.setAttribute("error", "Tiêu đề video phải có từ 3 đến 200 ký tự!");
+                req.setAttribute("video", video);
+                req.setAttribute("cateList", cateService.findAll());
+                req.setAttribute("userList", userService.findAll());
+                req.getRequestDispatcher("/views/admin/video-edit.jsp").forward(req, resp);
+                return;
             }
 
             video.setTitle(title != null ? title.trim() : "");

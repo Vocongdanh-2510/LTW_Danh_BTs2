@@ -5,76 +5,122 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chỉnh Sửa Danh Mục - JPA</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 30px; background-color: #f4f6f9; color: #333; }
-        .form-container { max-width: 600px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        h2 { color: #2c3e50; margin-top: 0; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; font-weight: 600; margin-bottom: 6px; }
-        input[type="text"], input[type="file"] { width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box; }
-        .preview-img { width: 200px; height: 140px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd; margin: 10px 0; }
-        .radio-group { display: flex; align-items: center; gap: 15px; margin-top: 5px; }
-        .radio-group label { font-weight: normal; margin-bottom: 0; cursor: pointer; }
-        .btn-submit { background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 15px; }
-        .btn-submit:hover { background-color: #0056b3; }
-        .btn-back { display: inline-block; margin-left: 10px; color: #6c757d; text-decoration: none; }
-        .btn-back:hover { text-decoration: underline; }
-    </style>
+    <title>Chỉnh Sửa Danh Mục - Admin Panel</title>
 </head>
 <body>
-<div class="form-container">
-    <h2>Cập Nhật Danh Mục (JPA)</h2>
-    <hr style="margin-bottom: 25px;">
-    <form action="<c:url value="/admin/category/update"/>" method="post" enctype="multipart/form-data">
-        <input type="hidden" name="categoryid" value="${cate.categoryId}">
-
-        <div class="form-group">
-            <label for="categoryname">Category name:</label>
-            <input type="text" id="categoryname" name="categoryname" value="${cate.categoryname}" required>
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2"><i class="fa-solid fa-pen-to-square text-warning me-2"></i>Chỉnh Sửa Danh Mục #${cate.categoryId}</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="<c:url value='/admin/categories'/>" class="btn btn-outline-secondary btn-sm">
+                <i class="fa-solid fa-arrow-left me-1"></i>Quay lại danh sách
+            </a>
         </div>
+    </div>
 
-        <div class="form-group">
-            <label for="images">Link images (URL):</label>
-            <input type="text" id="images" name="images" value="${cate.images}">
-        </div>
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
 
-        <div class="form-group">
-            <label>Hình ảnh hiện tại:</label>
-            <c:choose>
-                <c:when test="${cate.images != null && (fn:startsWith(cate.images, 'http://') || fn:startsWith(cate.images, 'https://'))}">
-                    <c:url value="${cate.images}" var="imgUrl"/>
-                </c:when>
-                <c:otherwise>
-                    <c:url value="/image?fname=${cate.images}" var="imgUrl"/>
-                </c:otherwise>
-            </c:choose>
-            <img class="preview-img" src="${imgUrl}" alt="${cate.categoryname}" onerror="this.src='https://placehold.co/200x140?text=No+Image'"/><br>
-        </div>
+                    <c:if test="${not empty error}">
+                        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center" role="alert">
+                            <i class="fa-solid fa-triangle-exclamation me-2 fs-5"></i>
+                            <div>${error}</div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    </c:if>
 
-        <div class="form-group">
-            <label for="images1">Upload images mới (nếu muốn thay đổi):</label>
-            <input type="file" id="images1" name="images1" accept="image/*">
-        </div>
+                    <form action="<c:url value='/admin/category/update'/>" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        <input type="hidden" name="categoryid" value="${cate.categoryId}">
 
-        <div class="form-group">
-            <label>Status:</label>
-            <div class="radio-group">
-                <label>
-                    <input type="radio" id="ston" name="status" value="1" ${cate.status == 1 ? 'checked' : ''}> Hoạt động
-                </label>
-                <label>
-                    <input type="radio" id="stoff" name="status" value="0" ${cate.status != 1 ? 'checked' : ''}> Khóa
-                </label>
+                        <div class="mb-3">
+                            <label for="categoryname" class="form-label fw-semibold">
+                                Tên danh mục (Category Name) (*)
+                            </label>
+                            <input type="text"
+                                   class="form-control ${not empty error ? 'is-invalid' : ''}"
+                                   id="categoryname"
+                                   name="categoryname"
+                                   value="${cate.categoryname}"
+                                   minlength="2"
+                                   maxlength="100"
+                                   required autofocus>
+                            <div class="invalid-feedback">
+                                Tên danh mục không được để trống (từ 2 đến 100 ký tự).
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="images" class="form-label fw-semibold">
+                                Link hình ảnh (URL)
+                            </label>
+                            <input type="text" class="form-control" id="images" name="images" value="${cate.images}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold d-block">Hình ảnh hiện tại</label>
+                            <c:choose>
+                                <c:when test="${cate.images != null && (fn:startsWith(cate.images, 'http://') || fn:startsWith(cate.images, 'https://'))}">
+                                    <c:url value="${cate.images}" var="imgUrl"/>
+                                </c:when>
+                                <c:otherwise>
+                                    <c:url value="/image?fname=${cate.images}" var="imgUrl"/>
+                                </c:otherwise>
+                            </c:choose>
+                            <img src="${imgUrl}" alt="${cate.categoryname}" class="img-thumbnail rounded" style="width: 180px; height: 120px; object-fit: cover;" onerror="this.src='https://placehold.co/180x120?text=No+Image'"/>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="images1" class="form-label fw-semibold">
+                                Upload ảnh mới thay thế (tùy chọn)
+                            </label>
+                            <input type="file" class="form-control" id="images1" name="images1" accept="image/*">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold d-block">Trạng thái (Status)</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="ston" name="status" value="1" ${cate.status == 1 ? 'checked' : ''}>
+                                <label class="form-check-label text-success fw-semibold" for="ston">
+                                    <i class="fa-solid fa-circle-check me-1"></i>Hoạt động
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="stoff" name="status" value="0" ${cate.status == 0 ? 'checked' : ''}>
+                                <label class="form-check-label text-danger fw-semibold" for="stoff">
+                                    <i class="fa-solid fa-circle-xmark me-1"></i>Khóa
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-warning px-4 fw-semibold text-dark">
+                                <i class="fa-solid fa-pen-to-square me-1"></i>Cập Nhật (Update)
+                            </button>
+                            <a class="btn btn-light border px-4" href="<c:url value='/admin/categories'/>">
+                                Hủy bỏ
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
+    </div>
 
-        <div style="margin-top: 25px;">
-            <input type="submit" class="btn-submit" value="Update">
-            <a class="btn-back" href="<c:url value="/admin/categories"/>">← Quay lại danh sách</a>
-        </div>
-    </form>
-</div>
+    <script>
+        (function () {
+            'use strict';
+            var forms = document.querySelectorAll('.needs-validation');
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+    </script>
 </body>
 </html>

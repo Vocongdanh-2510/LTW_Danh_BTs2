@@ -41,20 +41,29 @@ public class ForgotPasswordController extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
 
         String email = req.getParameter("email");
+        if (email != null) email = email.trim();
+        req.setAttribute("email", email);
 
-        if (email == null || email.trim().isEmpty()) {
-            req.setAttribute("alert", "Vui lòng nhập địa chỉ email của bạn!");
+        if (Utils.ValidationUtil.isEmpty(email)) {
+            req.setAttribute("errorEmail", "Vui lòng nhập địa chỉ email của bạn!");
+            req.setAttribute("alert", "Vui lòng nhập địa chỉ email!");
             req.getRequestDispatcher(FORGOT_VIEW).forward(req, resp);
             return;
         }
 
-        email = email.trim();
+        if (!Utils.ValidationUtil.isValidEmail(email)) {
+            req.setAttribute("errorEmail", "Địa chỉ email không đúng định dạng (VD: user@example.com)!");
+            req.setAttribute("alert", "Định dạng email không hợp lệ!");
+            req.getRequestDispatcher(FORGOT_VIEW).forward(req, resp);
+            return;
+        }
+
         UserService service = new UserServiceImpl();
         User user = service.getByEmail(email);
 
         if (user == null) {
-            req.setAttribute("alert", "Không tìm thấy tài khoản với email hoặc tên đăng nhập này trong hệ thống!");
-            req.setAttribute("email", email);
+            req.setAttribute("errorEmail", "Không tìm thấy tài khoản với email này trong hệ thống!");
+            req.setAttribute("alert", "Không tìm thấy tài khoản với email này trong hệ thống!");
             req.getRequestDispatcher(FORGOT_VIEW).forward(req, resp);
             return;
         }

@@ -72,22 +72,38 @@ public class ResetPasswordController extends HttpServlet {
         email = email.trim();
         req.setAttribute("email", email);
 
-        if (otpInput == null || otpInput.trim().isEmpty()
-                || newPassword == null || newPassword.trim().isEmpty()
-                || rePassword == null || rePassword.trim().isEmpty()) {
-            req.setAttribute("alert", "Vui lòng nhập đầy đủ mã OTP và mật khẩu mới!");
+        boolean hasError = false;
+        if (Utils.ValidationUtil.isEmpty(otpInput)) {
+            req.setAttribute("errorOtp", "Vui lòng nhập mã OTP 6 chữ số!");
+            hasError = true;
+        } else if (!Utils.ValidationUtil.isValidOtp(otpInput.trim())) {
+            req.setAttribute("errorOtp", "Mã OTP phải gồm chính xác 6 chữ số!");
+            hasError = true;
+        }
+
+        if (Utils.ValidationUtil.isEmpty(newPassword)) {
+            req.setAttribute("errorNewPassword", "Vui lòng nhập mật khẩu mới!");
+            hasError = true;
+        } else if (!Utils.ValidationUtil.isValidPassword(newPassword)) {
+            req.setAttribute("errorNewPassword", "Mật khẩu mới phải có ít nhất 6 ký tự!");
+            hasError = true;
+        }
+
+        if (Utils.ValidationUtil.isEmpty(rePassword)) {
+            req.setAttribute("errorRePassword", "Vui lòng xác nhận mật khẩu mới!");
+            hasError = true;
+        } else if (newPassword != null && !newPassword.equals(rePassword)) {
+            req.setAttribute("errorRePassword", "Mật khẩu xác nhận không khớp!");
+            hasError = true;
+        }
+
+        if (hasError) {
+            req.setAttribute("alert", "Vui lòng kiểm tra lại thông tin đặt lại mật khẩu!");
             req.getRequestDispatcher(RESET_VIEW).forward(req, resp);
             return;
         }
 
         otpInput = otpInput.trim();
-
-        // Kiểm tra khớp mật khẩu
-        if (!newPassword.equals(rePassword)) {
-            req.setAttribute("alert", "Mật khẩu xác nhận không khớp!");
-            req.getRequestDispatcher(RESET_VIEW).forward(req, resp);
-            return;
-        }
 
         // Kiểm tra OTP
         boolean isValidOtp = false;

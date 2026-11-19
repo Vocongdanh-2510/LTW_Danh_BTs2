@@ -2,241 +2,90 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xác thực mã OTP - Võ Công Danh (24110010)</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: #fff;
-            color: #111;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        header {
-            border-bottom: 2px solid #111;
-            padding: 20px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        header .logo {
-            font-size: 1.1rem;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        header a {
-            color: #111;
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 600;
-            opacity: 0.7;
-        }
-
-        header a:hover {
-            opacity: 1;
-        }
-
-        main {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 60px 20px;
-        }
-
-        .form-wrap {
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .form-wrap h2 {
-            font-size: 2rem;
-            font-weight: 800;
-            margin-bottom: 8px;
-            letter-spacing: -1px;
-        }
-
-        .subtitle {
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 24px;
-            line-height: 1.5;
-        }
-
-        .email-badge {
-            display: inline-block;
-            background: #f1f3f5;
-            color: #111;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 0.88rem;
-            margin-bottom: 18px;
-        }
-
-        .alert-danger {
-            background: #fff5f5;
-            border-left: 3px solid #c0392b;
-            padding: 12px 14px;
-            font-size: 0.88rem;
-            color: #c0392b;
-            margin-bottom: 18px;
-            border-radius: 2px;
-        }
-
-        .msg-success {
-            background: #f5fff5;
-            border-left: 3px solid #27ae60;
-            padding: 12px 14px;
-            font-size: 0.88rem;
-            color: #27ae60;
-            margin-bottom: 18px;
-            border-radius: 2px;
-        }
-
-        .field {
-            margin-bottom: 24px;
-        }
-
-        .field label {
-            display: block;
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-            color: #555;
-        }
-
-        .field input.otp-input {
-            width: 100%;
-            padding: 12px 0;
-            border: none;
-            border-bottom: 2px solid #ddd;
-            font-size: 1.6rem;
-            font-weight: 700;
-            letter-spacing: 8px;
-            text-align: center;
-            outline: none;
-            background: transparent;
-            color: #111;
-            transition: border-color 0.2s;
-        }
-
-        .field input.otp-input:focus {
-            border-bottom-color: #111;
-        }
-
-        .btn-submit {
-            width: 100%;
-            padding: 14px;
-            background: #111;
-            color: #fff;
-            border: none;
-            font-size: 0.85rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .btn-submit:hover {
-            background: #333;
-        }
-
-        .resend-box {
-            margin-top: 24px;
-            text-align: center;
-            font-size: 0.88rem;
-            color: #777;
-        }
-
-        .resend-box a {
-            color: #111;
-            font-weight: 700;
-            text-decoration: none;
-            border-bottom: 1px solid #111;
-        }
-
-        .resend-box a:hover {
-            color: #000;
-        }
-
-        footer {
-            border-top: 1px solid #ddd;
-            padding: 16px 40px;
-            text-align: center;
-            font-size: 0.8rem;
-            color: #999;
-        }
-    </style>
+    <title>Xác thực mã OTP - WebVideo Hub</title>
 </head>
-
 <body>
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card shadow-sm border-0 rounded-3">
+                    <div class="card-body p-4 p-sm-5 text-center">
+                        <div class="bg-success bg-opacity-10 text-success d-inline-flex p-3 rounded-circle mb-3">
+                            <i class="fa-solid fa-envelope-circle-check fs-3"></i>
+                        </div>
+                        <h3 class="fw-bold text-dark mb-1">Xác Thực Mã OTP</h3>
+                        <p class="text-muted small mb-4">
+                            Mã OTP 6 số đã được gửi tới email: <br>
+                            <strong class="text-primary">${email}</strong>
+                        </p>
 
-    <header>
-        <span class="logo">Võ Công Danh - 24110010</span>
-        <a href="${pageContext.request.contextPath}/login">← Quay lại Đăng nhập</a>
-    </header>
+                        <c:if test="${not empty msg}">
+                            <div class="alert alert-info text-start small mb-3">
+                                <i class="fa-solid fa-circle-info me-1"></i>${msg}
+                            </div>
+                        </c:if>
 
-    <main>
-        <div class="form-wrap">
-            <h2>Kích Hoạt Tài Khoản</h2>
-            <p class="subtitle">
-                Hệ thống đã gửi mã OTP xác thực (gồm 6 chữ số) đến email của bạn.<br>
-                Mã OTP có hiệu lực trong vòng <b>5 phút</b>.
-            </p>
+                        <c:if test="${not empty alert}">
+                            <div class="alert alert-danger text-start small mb-3">
+                                <i class="fa-solid fa-triangle-exclamation me-1"></i>${alert}
+                            </div>
+                        </c:if>
 
-            <c:if test="${not empty email}">
-                <div class="email-badge">📧 ${email}</div>
-            </c:if>
+                        <form action="${pageContext.request.contextPath}/verify-otp" method="post" class="needs-validation" novalidate>
+                            <input type="hidden" name="email" value="${email}">
 
-            <c:if test="${not empty alert}">
-                <div class="alert-danger">${alert}</div>
-            </c:if>
+                            <div class="mb-4">
+                                <label for="otp" class="form-label fw-semibold text-start w-100">
+                                    Nhập mã OTP 6 số:
+                                </label>
+                                <input type="text"
+                                       class="form-control text-center fs-3 fw-bold tracking-widest ${not empty errorOtp ? 'is-invalid' : ''}"
+                                       id="otp"
+                                       name="otp"
+                                       placeholder="------"
+                                       maxlength="6"
+                                       pattern="^[0-9]{6}$"
+                                       required autofocus>
+                                <div class="invalid-feedback">
+                                    Vui lòng nhập chính xác 6 chữ số OTP.
+                                </div>
+                            </div>
 
-            <c:if test="${param.resend eq '1'}">
-                <div class="msg-success">Mã OTP mới đã được gửi lại thành công! Vui lòng kiểm tra email (hoặc console server).</div>
-            </c:if>
+                            <button type="submit" class="btn btn-success w-100 py-2 fw-semibold shadow-sm mb-3">
+                                <i class="fa-solid fa-check me-2"></i>Kích Hoạt Tài Khoản
+                            </button>
+                        </form>
 
-            <form action="${pageContext.request.contextPath}/verify-otp" method="post">
-                <input type="hidden" name="email" value="${email}">
-
-                <div class="field">
-                    <label for="otp">Nhập mã OTP (6 chữ số)</label>
-                    <input type="text" id="otp" name="otp" class="otp-input"
-                           maxlength="6" placeholder="______" required autofocus autocomplete="off">
+                        <div class="d-flex justify-content-between align-items-center pt-3 border-top small">
+                            <a href="${pageContext.request.contextPath}/resend-otp?email=${email}&type=register" class="text-decoration-none text-primary">
+                                <i class="fa-solid fa-rotate-right me-1"></i>Gửi lại mã OTP
+                            </a>
+                            <a href="${pageContext.request.contextPath}/login" class="text-decoration-none text-muted">
+                                Quay lại Đăng nhập
+                            </a>
+                        </div>
+                    </div>
                 </div>
-
-                <button type="submit" class="btn-submit">Xác thực & Kích hoạt</button>
-            </form>
-
-            <div class="resend-box">
-                Chưa nhận được mã OTP?
-                <a href="${pageContext.request.contextPath}/resend-otp?email=${email}&type=register">
-                    Gửi lại mã OTP
-                </a>
             </div>
         </div>
-    </main>
+    </div>
 
-    <footer>&copy; 2026 Võ Công Danh - MSSV: 24110010</footer>
-
+    <script>
+        (function () {
+            'use strict';
+            var forms = document.querySelectorAll('.needs-validation');
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+    </script>
 </body>
-
 </html>

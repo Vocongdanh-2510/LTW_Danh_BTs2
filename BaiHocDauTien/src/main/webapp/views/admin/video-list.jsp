@@ -5,124 +5,109 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản Lý Videos (CRUD) - Admin | Võ Công Danh</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 30px; background-color: #f4f6f9; color: #333; }
-        .container { max-width: 1200px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        h2 { margin: 0; color: #2c3e50; }
-        .btn-add { background-color: #007bff; color: white; padding: 10px 18px; text-decoration: none; border-radius: 5px; font-weight: 600; display: inline-block; transition: 0.2s; }
-        .btn-add:hover { background-color: #0056b3; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #dee2e6; padding: 12px; text-align: center; vertical-align: middle; }
-        th { background-color: #343a40; color: #fff; font-weight: 600; }
-        tr:hover { background-color: #f8f9fa; }
-        .video-img { width: 120px; height: 75px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd; }
-        .badge { padding: 5px 10px; border-radius: 12px; font-size: 13px; font-weight: 600; }
-        .badge-active { background-color: #d4edda; color: #155724; }
-        .badge-locked { background-color: #f8d7da; color: #721c24; }
-        .action-link { padding: 6px 12px; border-radius: 4px; text-decoration: none; font-weight: 500; font-size: 14px; margin: 0 3px; display: inline-block; }
-        .link-view { background-color: #17a2b8; color: white; }
-        .link-view:hover { background-color: #138496; }
-        .link-edit { background-color: #ffc107; color: #212529; }
-        .link-edit:hover { background-color: #e0a800; }
-        .link-delete { background-color: #dc3545; color: white; }
-        .link-delete:hover { background-color: #c82333; }
-        .nav-link { margin-right: 15px; color: #555; text-decoration: none; font-weight: 500; }
-        .nav-link:hover { color: #007bff; }
-    </style>
+    <title>Quản Lý Videos - Admin Panel</title>
 </head>
 <body>
-<div class="container">
-    <div style="margin-bottom: 15px;">
-        <a class="nav-link" href="<c:url value='/home'/>">← Trang chủ (/home)</a>
-        <a class="nav-link" href="<c:url value='/video'/>">Xem Videos (/video)</a>
-        <a class="nav-link" href="<c:url value='/admin/categories'/>">Quản lý Danh mục</a>
-        <a class="nav-link" href="<c:url value='/logout'/>" style="color: #dc3545;">Đăng xuất</a>
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2"><i class="fa-solid fa-video text-primary me-2"></i>Quản Lý Videos</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="<c:url value='/admin/video/add'/>" class="btn btn-success btn-sm">
+                <i class="fa-solid fa-plus me-1"></i>Thêm Video Mới
+            </a>
+        </div>
     </div>
 
-    <div class="header-bar">
-        <h2>Quản Lý Videos (CRUD - JPA 3.0 &amp; Multipart Upload)</h2>
-        <a class="btn-add" href="<c:url value='/admin/video/add'/>">+ Thêm Video mới</a>
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="text-center" style="width: 50px;">STT</th>
+                            <th style="width: 130px;">Poster</th>
+                            <th style="width: 100px;">Mã Video</th>
+                            <th>Tiêu đề video</th>
+                            <th style="width: 140px;">Người đăng</th>
+                            <th style="width: 130px;">Danh mục</th>
+                            <th class="text-center" style="width: 90px;">Lượt xem</th>
+                            <th class="text-center" style="width: 110px;">Trạng thái</th>
+                            <th class="text-center" style="width: 180px;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:forEach items="${videoList}" var="v" varStatus="STT">
+                            <tr>
+                                <td class="text-center fw-bold text-muted">${STT.index + 1}</td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${v.poster != null && (fn:startsWith(v.poster, 'http://') || fn:startsWith(v.poster, 'https://'))}">
+                                            <c:url value="${v.poster}" var="posterImg"/>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <c:url value="/image?fname=${v.poster}" var="posterImg"/>
+                                        </c:otherwise>
+                                    </c:choose>
+                                    <img src="${posterImg}" alt="${v.title}" class="img-thumbnail rounded" style="width: 110px; height: 70px; object-fit: cover;" onerror="this.src='https://placehold.co/110x70?text=No+Poster'"/>
+                                </td>
+                                <td><code>${v.videoId}</code></td>
+                                <td class="fw-semibold text-dark">
+                                    <a href="<c:url value='/video/detail?id=${v.videoId}'/>" class="text-decoration-none text-dark" target="_blank" title="Xem video">
+                                        ${v.title} <i class="fa-solid fa-arrow-up-right-from-square small text-muted"></i>
+                                    </a>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">
+                                        <i class="fa-solid fa-user me-1"></i>
+                                        <c:choose>
+                                            <c:when test="${not empty v.user.fullname}">${v.user.fullname}</c:when>
+                                            <c:otherwise>${v.user.username}</c:otherwise>
+                                        </c:choose>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">
+                                        ${v.category != null ? v.category.categoryname : 'Chưa phân loại'}
+                                    </span>
+                                </td>
+                                <td class="text-center fw-semibold text-muted">
+                                    <i class="fa-solid fa-eye me-1 small"></i>${v.views}
+                                </td>
+                                <td class="text-center">
+                                    <c:choose>
+                                        <c:when test="${v.active}">
+                                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1">
+                                                <i class="fa-solid fa-circle-check me-1"></i>Công khai
+                                            </span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="badge bg-secondary px-2 py-1">
+                                                <i class="fa-solid fa-lock me-1"></i>Ẩn
+                                            </span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </td>
+                                <td class="text-center">
+                                    <a class="btn btn-sm btn-outline-warning text-dark me-1" href="<c:url value='/admin/video/edit?id=${v.videoId}'/>" title="Sửa video">
+                                        <i class="fa-solid fa-pen-to-square"></i> Sửa
+                                    </a>
+                                    <a class="btn btn-sm btn-outline-danger" href="<c:url value='/admin/video/delete?id=${v.videoId}'/>" onclick="return confirm('Bạn có chắc chắn muốn xóa video này?');" title="Xóa video">
+                                        <i class="fa-solid fa-trash-can"></i> Xóa
+                                    </a>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                        <c:if test="${empty videoList}">
+                            <tr>
+                                <td colspan="9" class="text-center py-4 text-muted">
+                                    <i class="fa-solid fa-video-slash fs-2 d-block mb-2"></i>
+                                    Chưa có video nào trong hệ thống.
+                                </td>
+                            </tr>
+                        </c:if>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-    <hr>
-    
-    <table>
-        <thead>
-            <tr>
-                <th style="width: 45px;">STT</th>
-                <th style="width: 130px;">Poster</th>
-                <th style="width: 90px;">Mã Video</th>
-                <th>Tiêu đề video</th>
-                <th style="width: 130px;">Người đăng</th>
-                <th style="width: 120px;">Danh mục</th>
-                <th style="width: 80px;">Lượt xem</th>
-                <th style="width: 100px;">Trạng thái</th>
-                <th style="width: 170px;">Thao tác</th>
-            </tr>
-        </thead>
-        <tbody>
-            <c:forEach items="${videoList}" var="v" varStatus="STT">
-                <tr>
-                    <td>${STT.index + 1}</td>
-                    <td>
-                        <c:choose>
-                            <c:when test="${v.poster != null && (fn:startsWith(v.poster, 'http://') || fn:startsWith(v.poster, 'https://'))}">
-                                <c:set var="vPoster" value="${v.poster}" />
-                            </c:when>
-                            <c:when test="${not empty v.poster}">
-                                <c:set var="vPoster" value="${pageContext.request.contextPath}/image?fname=${v.poster}" />
-                            </c:when>
-                            <c:otherwise>
-                                <c:set var="vPoster" value="https://placehold.co/120x75?text=No+Poster" />
-                            </c:otherwise>
-                        </c:choose>
-                        <img class="video-img" src="${vPoster}" alt="${v.title}" onerror="this.src='https://placehold.co/120x75?text=No+Poster'"/>
-                    </td>
-                    <td><code>${v.videoId}</code></td>
-                    <td style="text-align: left; font-weight: 600;">
-                        <a href="<c:url value='/video/detail?id=${v.videoId}'/>" target="_blank" style="color: #007bff; text-decoration: none;">
-                            ${v.title}
-                        </a>
-                    </td>
-                    <td>
-                        ${v.user != null ? (v.user.fullname != null ? v.user.fullname : v.user.username) : 'Admin'}
-                    </td>
-                    <td>
-                        <c:choose>
-                            <c:when test="${not empty v.category}">
-                                <span style="background: #e2e8f0; padding: 3px 8px; border-radius: 4px; font-size: 13px;">${v.category.categoryname}</span>
-                            </c:when>
-                            <c:otherwise>
-                                <span style="color: #999;">—</span>
-                            </c:otherwise>
-                        </c:choose>
-                    </td>
-                    <td><strong>${v.views}</strong></td>
-                    <td>
-                        <c:if test="${v.active}">
-                            <span class="badge badge-active">Hoạt động</span>
-                        </c:if>
-                        <c:if test="${!v.active}">
-                            <span class="badge badge-locked">Khóa</span>
-                        </c:if>
-                    </td>
-                    <td>
-                        <a class="action-link link-view" href="<c:url value='/video/detail?id=${v.videoId}'/>" target="_blank">Xem</a>
-                        <a class="action-link link-edit" href="<c:url value='/admin/video/edit?id=${v.videoId}'/>">Sửa</a>
-                        <a class="action-link link-delete" href="<c:url value='/admin/video/delete?id=${v.videoId}'/>" onclick="return confirm('Bạn có chắc chắn muốn xóa video này?');">Xóa</a>
-                    </td>
-                </tr>
-            </c:forEach>
-
-            <c:if test="${empty videoList}">
-                <tr>
-                    <td colspan="9" style="padding: 25px; color: #888;">Chưa có video nào. Nhấn "+ Thêm Video mới" để bắt đầu!</td>
-                </tr>
-            </c:if>
-        </tbody>
-    </table>
-</div>
 </body>
 </html>

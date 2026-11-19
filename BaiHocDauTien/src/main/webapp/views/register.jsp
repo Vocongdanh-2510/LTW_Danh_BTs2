@@ -1,224 +1,214 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-    <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-        <!DOCTYPE html>
-        <html lang="vi">
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng ký tài khoản - WebVideo Hub</title>
+</head>
+<body>
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card shadow-sm border-0 rounded-3">
+                    <div class="card-body p-4 p-sm-5">
+                        <div class="text-center mb-4">
+                            <div class="bg-success bg-opacity-10 text-success d-inline-flex p-3 rounded-circle mb-3">
+                                <i class="fa-solid fa-user-plus fs-3"></i>
+                            </div>
+                            <h3 class="fw-bold text-dark">Tạo Tài Khoản Mới</h3>
+                            <p class="text-muted small">Điền các thông tin dưới đây để đăng ký và nhận mã kích hoạt OTP qua Email.</p>
+                        </div>
 
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Đăng ký - Võ Công Danh (24110010)</title>
-            <style>
-                * {
-                    margin: 0;
-                    padding: 0;
-                    box-sizing: border-box;
-                }
-
-                body {
-                    font-family: 'Segoe UI', Arial, sans-serif;
-                    background: #fff;
-                    color: #111;
-                    min-height: 100vh;
-                    display: flex;
-                    flex-direction: column;
-                }
-
-                header {
-                    border-bottom: 2px solid #111;
-                    padding: 20px 40px;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                }
-
-                header .logo {
-                    font-size: 1.1rem;
-                    font-weight: 700;
-                    letter-spacing: 2px;
-                    text-transform: uppercase;
-                }
-
-                header a {
-                    color: #111;
-                    text-decoration: none;
-                    font-size: 0.85rem;
-                    font-weight: 600;
-                    opacity: 0.6;
-                }
-
-                header a:hover {
-                    opacity: 1;
-                }
-
-                main {
-                    flex: 1;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    padding: 48px 20px;
-                }
-
-                .form-wrap {
-                    width: 100%;
-                    max-width: 380px;
-                }
-
-                .form-wrap h2 {
-                    font-size: 1.9rem;
-                    font-weight: 800;
-                    margin-bottom: 24px;
-                    letter-spacing: -1px;
-                }
-
-                .alert-danger {
-                    background: #fff5f5;
-                    border-left: 3px solid #c0392b;
-                    padding: 11px 14px;
-                    font-size: 0.88rem;
-                    color: #c0392b;
-                    margin-bottom: 18px;
-                }
-
-                .field {
-                    margin-bottom: 20px;
-                }
-
-                .field label {
-                    display: block;
-                    font-size: 0.75rem;
-                    font-weight: 700;
-                    letter-spacing: 1px;
-                    text-transform: uppercase;
-                    margin-bottom: 8px;
-                    color: #555;
-                }
-
-                .field input {
-                    width: 100%;
-                    padding: 12px 0;
-                    border: none;
-                    border-bottom: 2px solid #ddd;
-                    font-size: 1rem;
-                    outline: none;
-                    background: transparent;
-                    color: #111;
-                    transition: border-color 0.2s;
-                }
-
-                .field input:focus {
-                    border-bottom-color: #111;
-                }
-
-                .btn-submit {
-                    width: 100%;
-                    padding: 14px;
-                    background: #111;
-                    color: #fff;
-                    border: none;
-                    font-size: 0.85rem;
-                    font-weight: 700;
-                    letter-spacing: 1px;
-                    text-transform: uppercase;
-                    cursor: pointer;
-                    margin-top: 8px;
-                    transition: background 0.2s;
-                }
-
-                .btn-submit:hover {
-                    background: #333;
-                }
-
-                .link-row {
-                    margin-top: 18px;
-                    text-align: center;
-                    font-size: 0.85rem;
-                    color: #888;
-                }
-
-                .link-row a {
-                    color: #111;
-                    font-weight: 700;
-                    text-decoration: none;
-                    border-bottom: 1px solid #111;
-                }
-
-                footer {
-                    border-top: 1px solid #ddd;
-                    padding: 16px 40px;
-                    text-align: center;
-                    font-size: 0.8rem;
-                    color: #999;
-                }
-            </style>
-        </head>
-
-        <body>
-
-            <header>
-                <span class="logo">Võ Công Danh - 24110010</span>
-                <a href="${pageContext.request.contextPath}/login">← Đăng nhập</a>
-            </header>
-
-            <main>
-                <div class="form-wrap">
-                    <h2>Tạo tài khoản mới</h2>
-
-                    <%-- Hiển thị alert từ Controller: ${alert} theo đúng slide --%>
+                        <%-- Alert Thông báo lỗi tổng quát --%>
                         <c:if test="${not empty alert}">
-                            <div class="alert-danger">${alert}</div>
+                            <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center" role="alert">
+                                <i class="fa-solid fa-circle-exclamation me-2 fs-5"></i>
+                                <div>${alert}</div>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
                         </c:if>
 
-                        <%-- Form POST đến /register - theo slide: action="register" method="post" --%>
-                            <form action="${pageContext.request.contextPath}/register" method="post">
-
-                                <div class="field">
-                                    <label for="username">Tài khoản</label>
-                                    <input type="text" id="username" name="username" value="${param.username}"
-                                        placeholder="Tài khoản" required autofocus>
+                        <%-- Form Đăng ký có Bootstrap & Server-side Validation --%>
+                        <form action="${pageContext.request.contextPath}/register" method="post" class="needs-validation" novalidate>
+                            
+                            <div class="row g-3 mb-3">
+                                <div class="col-sm-6">
+                                    <label for="username" class="form-label fw-semibold">
+                                        <i class="fa-solid fa-at me-1 text-secondary"></i>Tên đăng nhập (*)
+                                    </label>
+                                    <input type="text"
+                                           class="form-control ${not empty errorUsername ? 'is-invalid' : ''}"
+                                           id="username"
+                                           name="username"
+                                           value="${username}"
+                                           placeholder="vd: nguyenvana"
+                                           minlength="3"
+                                           maxlength="50"
+                                           pattern="^[a-zA-Z0-9_]{3,50}$"
+                                           required>
+                                    <c:choose>
+                                        <c:when test="${not empty errorUsername}">
+                                            <div class="invalid-feedback d-block">${errorUsername}</div>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <div class="invalid-feedback">3 - 50 ký tự, chữ cái, số hoặc gạch dưới.</div>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </div>
 
-                                <div class="field">
-                                    <label for="fullname">Họ tên</label>
-                                    <input type="text" id="fullname" name="fullname" value="${param.fullname}"
-                                        placeholder="Họ tên" required>
+                                <div class="col-sm-6">
+                                    <label for="fullname" class="form-label fw-semibold">
+                                        <i class="fa-solid fa-id-badge me-1 text-secondary"></i>Họ và tên (*)
+                                    </label>
+                                    <input type="text"
+                                           class="form-control ${not empty errorFullname ? 'is-invalid' : ''}"
+                                           id="fullname"
+                                           name="fullname"
+                                           value="${fullname}"
+                                           placeholder="Nguyễn Văn A"
+                                           minlength="2"
+                                           required>
+                                    <c:choose>
+                                        <c:when test="${not empty errorFullname}">
+                                            <div class="invalid-feedback d-block">${errorFullname}</div>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <div class="invalid-feedback">Vui lòng nhập họ và tên của bạn.</div>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </div>
-
-                                <div class="field">
-                                    <label for="email">Nhập Email</label>
-                                    <input type="email" id="email" name="email" value="${param.email}"
-                                        placeholder="Nhập Email">
-                                </div>
-
-                                <div class="field">
-                                    <label for="phone">Số điện thoại</label>
-                                    <input type="tel" id="phone" name="phone" value="${param.phone}"
-                                        placeholder="Số điện thoại">
-                                </div>
-
-                                <div class="field">
-                                    <label for="password">Mật khẩu</label>
-                                    <input type="password" id="password" name="password" placeholder="Mật khẩu"
-                                        required>
-                                </div>
-
-                                <div class="field">
-                                    <label for="repassword">Nhập lại mật khẩu</label>
-                                    <input type="password" id="repassword" name="repassword"
-                                        placeholder="Nhập lại mật khẩu" required>
-                                </div>
-
-                                <button type="submit" class="btn-submit">Tạo tài khoản</button>
-                            </form>
-
-                            <div class="link-row">
-                                Nếu bạn đã có tài khoản?
-                                <a href="${pageContext.request.contextPath}/login">Đăng nhập</a>
                             </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-sm-6">
+                                    <label for="email" class="form-label fw-semibold">
+                                        <i class="fa-solid fa-envelope me-1 text-secondary"></i>Email nhận OTP (*)
+                                    </label>
+                                    <input type="email"
+                                           class="form-control ${not empty errorEmail ? 'is-invalid' : ''}"
+                                           id="email"
+                                           name="email"
+                                           value="${email}"
+                                           placeholder="user@example.com"
+                                           required>
+                                    <c:choose>
+                                        <c:when test="${not empty errorEmail}">
+                                            <div class="invalid-feedback d-block">${errorEmail}</div>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <div class="invalid-feedback">Email không đúng định dạng.</div>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <label for="phone" class="form-label fw-semibold">
+                                        <i class="fa-solid fa-phone me-1 text-secondary"></i>Số điện thoại (*)
+                                    </label>
+                                    <input type="tel"
+                                           class="form-control ${not empty errorPhone ? 'is-invalid' : ''}"
+                                           id="phone"
+                                           name="phone"
+                                           value="${phone}"
+                                           placeholder="0912345678"
+                                           pattern="^(0|\\+84)(3[2-9]|5[6|8|9]|7[0|6-9]|8[1-9]|9[0-9])[0-9]{7}$"
+                                           required>
+                                    <c:choose>
+                                        <c:when test="${not empty errorPhone}">
+                                            <div class="invalid-feedback d-block">${errorPhone}</div>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <div class="invalid-feedback">Số điện thoại 10 số (bắt đầu bằng 03, 05, 07, 08, 09).</div>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-sm-6">
+                                    <label for="password" class="form-label fw-semibold">
+                                        <i class="fa-solid fa-key me-1 text-secondary"></i>Mật khẩu (*)
+                                    </label>
+                                    <input type="password"
+                                           class="form-control ${not empty errorPassword ? 'is-invalid' : ''}"
+                                           id="password"
+                                           name="password"
+                                           placeholder="Tối thiểu 6 ký tự"
+                                           minlength="6"
+                                           required>
+                                    <c:choose>
+                                        <c:when test="${not empty errorPassword}">
+                                            <div class="invalid-feedback d-block">${errorPassword}</div>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <div class="invalid-feedback">Mật khẩu phải từ 6 ký tự trở lên.</div>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <label for="repassword" class="form-label fw-semibold">
+                                        <i class="fa-solid fa-lock me-1 text-secondary"></i>Xác nhận mật khẩu (*)
+                                    </label>
+                                    <input type="password"
+                                           class="form-control ${not empty errorRepassword ? 'is-invalid' : ''}"
+                                           id="repassword"
+                                           name="repassword"
+                                           placeholder="Nhập lại mật khẩu"
+                                           minlength="6"
+                                           required>
+                                    <c:choose>
+                                        <c:when test="${not empty errorRepassword}">
+                                            <div class="invalid-feedback d-block">${errorRepassword}</div>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <div class="invalid-feedback">Vui lòng xác nhận lại mật khẩu.</div>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-success w-100 py-2 fw-semibold shadow-sm">
+                                <i class="fa-solid fa-paper-plane me-2"></i>Đăng Ký &amp; Gửi Mã OTP
+                            </button>
+                        </form>
+
+                        <div class="text-center mt-4">
+                            <span class="text-muted small">Đã có tài khoản?</span>
+                            <a href="${pageContext.request.contextPath}/login" class="fw-bold text-decoration-none ms-1">
+                                Đăng nhập ngay
+                            </a>
+                        </div>
+                    </div>
                 </div>
-            </main>
+            </div>
+        </div>
+    </div>
 
-            <footer>&copy; 2026 Võ Công Danh - MSSV: 24110010</footer>
+    <%-- Client-side Bootstrap validation script --%>
+    <script>
+        (function () {
+            'use strict';
+            var forms = document.querySelectorAll('.needs-validation');
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    var pass = document.getElementById('password').value;
+                    var repass = document.getElementById('repassword').value;
+                    if (pass && repass && pass !== repass) {
+                        document.getElementById('repassword').setCustomValidity('Mật khẩu không khớp');
+                    } else {
+                        document.getElementById('repassword').setCustomValidity('');
+                    }
 
-        </body>
-
-        </html>
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+    </script>
+</body>
+</html>

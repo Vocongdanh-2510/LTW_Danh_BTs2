@@ -76,29 +76,82 @@ public class register_controller extends HttpServlet {
         String fullname   = req.getParameter("fullname");
         String phone      = req.getParameter("phone");
 
+        if (username != null) username = username.trim();
+        if (email != null) email = email.trim();
+        if (fullname != null) fullname = fullname.trim();
+        if (phone != null) phone = phone.trim();
+
+        // Lưu lại dữ liệu người dùng đã nhập
+        req.setAttribute("username", username);
+        req.setAttribute("email", email);
+        req.setAttribute("fullname", fullname);
+        req.setAttribute("phone", phone);
+
         UserService service = new UserServiceImpl();
-        String alertMsg = "";
+        boolean hasError = false;
 
-        // Kiểm tra mật khẩu xác nhận
-        if (repassword != null && !repassword.trim().isEmpty() && !password.equals(repassword)) {
-            alertMsg = "Mật khẩu xác nhận không khớp!";
-            req.setAttribute("alert", alertMsg);
-            req.getRequestDispatcher(REGISTER).forward(req, resp);
-            return;
+        // 1. Validate username
+        if (Utils.ValidationUtil.isEmpty(username)) {
+            req.setAttribute("errorUsername", "Tên đăng nhập không được để trống!");
+            hasError = true;
+        } else if (!Utils.ValidationUtil.isValidUsername(username)) {
+            req.setAttribute("errorUsername", "Tên đăng nhập từ 3 - 50 ký tự, không chứa khoảng trắng hay ký tự đặc biệt!");
+            hasError = true;
+        } else if (service.checkExistUsername(username)) {
+            req.setAttribute("errorUsername", "Tên đăng nhập này đã tồn tại trong hệ thống!");
+            hasError = true;
         }
 
-        // Kiểm tra email đã tồn tại chưa
-        if (service.checkExistEmail(email)) {
-            alertMsg = "Email đã tồn tại trong hệ thống!";
-            req.setAttribute("alert", alertMsg);
-            req.getRequestDispatcher(REGISTER).forward(req, resp);
-            return;
+        // 2. Validate fullname
+        if (Utils.ValidationUtil.isEmpty(fullname)) {
+            req.setAttribute("errorFullname", "Họ và tên không được để trống!");
+            hasError = true;
+        } else if (fullname.length() < 2) {
+            req.setAttribute("errorFullname", "Họ và tên phải có ít nhất 2 ký tự!");
+            hasError = true;
         }
 
-        // Kiểm tra username đã tồn tại chưa
-        if (service.checkExistUsername(username)) {
-            alertMsg = "Tài khoản (username) đã tồn tại!";
-            req.setAttribute("alert", alertMsg);
+        // 3. Validate email
+        if (Utils.ValidationUtil.isEmpty(email)) {
+            req.setAttribute("errorEmail", "Địa chỉ email không được để trống!");
+            hasError = true;
+        } else if (!Utils.ValidationUtil.isValidEmail(email)) {
+            req.setAttribute("errorEmail", "Định dạng email không hợp lệ (Ví dụ: user@example.com)!");
+            hasError = true;
+        } else if (service.checkExistEmail(email)) {
+            req.setAttribute("errorEmail", "Email này đã được sử dụng bởi tài khoản khác!");
+            hasError = true;
+        }
+
+        // 4. Validate phone
+        if (Utils.ValidationUtil.isEmpty(phone)) {
+            req.setAttribute("errorPhone", "Số điện thoại không được để trống!");
+            hasError = true;
+        } else if (!Utils.ValidationUtil.isValidPhone(phone)) {
+            req.setAttribute("errorPhone", "Số điện thoại không hợp lệ (gồm 10 số, bắt đầu bằng 03, 05, 07, 08, 09)!");
+            hasError = true;
+        }
+
+        // 5. Validate password
+        if (Utils.ValidationUtil.isEmpty(password)) {
+            req.setAttribute("errorPassword", "Mật khẩu không được để trống!");
+            hasError = true;
+        } else if (!Utils.ValidationUtil.isValidPassword(password)) {
+            req.setAttribute("errorPassword", "Mật khẩu phải có tối thiểu 6 ký tự!");
+            hasError = true;
+        }
+
+        // 6. Validate repassword
+        if (Utils.ValidationUtil.isEmpty(repassword)) {
+            req.setAttribute("errorRepassword", "Vui lòng nhập lại mật khẩu xác nhận!");
+            hasError = true;
+        } else if (!password.equals(repassword)) {
+            req.setAttribute("errorRepassword", "Mật khẩu xác nhận không khớp!");
+            hasError = true;
+        }
+
+        if (hasError) {
+            req.setAttribute("alert", "Vui lòng kiểm tra lại các trường thông tin đăng ký bên dưới!");
             req.getRequestDispatcher(REGISTER).forward(req, resp);
             return;
         }
@@ -125,8 +178,7 @@ public class register_controller extends HttpServlet {
             String encodedEmail = URLEncoder.encode(email, StandardCharsets.UTF_8.toString());
             resp.sendRedirect(req.getContextPath() + "/verify-otp?email=" + encodedEmail);
         } else {
-            alertMsg = "Đã xảy ra lỗi khi tạo tài khoản, vui lòng thử lại!";
-            req.setAttribute("alert", alertMsg);
+            req.setAttribute("alert", "Đã xảy ra lỗi khi tạo tài khoản, vui lòng thử lại!");
             req.getRequestDispatcher(REGISTER).forward(req, resp);
         }
     }

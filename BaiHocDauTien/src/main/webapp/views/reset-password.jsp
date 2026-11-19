@@ -2,256 +2,151 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đặt lại mật khẩu - Võ Công Danh (24110010)</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: #fff;
-            color: #111;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        header {
-            border-bottom: 2px solid #111;
-            padding: 20px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        header .logo {
-            font-size: 1.1rem;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        header a {
-            color: #111;
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 600;
-            opacity: 0.7;
-        }
-
-        header a:hover {
-            opacity: 1;
-        }
-
-        main {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 50px 20px;
-        }
-
-        .form-wrap {
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .form-wrap h2 {
-            font-size: 2rem;
-            font-weight: 800;
-            margin-bottom: 8px;
-            letter-spacing: -1px;
-        }
-
-        .subtitle {
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 24px;
-            line-height: 1.5;
-        }
-
-        .email-badge {
-            display: inline-block;
-            background: #f1f3f5;
-            color: #111;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 0.88rem;
-            margin-bottom: 18px;
-        }
-
-        .alert-danger {
-            background: #fff5f5;
-            border-left: 3px solid #c0392b;
-            padding: 12px 14px;
-            font-size: 0.88rem;
-            color: #c0392b;
-            margin-bottom: 18px;
-            border-radius: 2px;
-        }
-
-        .msg-success {
-            background: #f5fff5;
-            border-left: 3px solid #27ae60;
-            padding: 12px 14px;
-            font-size: 0.88rem;
-            color: #27ae60;
-            margin-bottom: 18px;
-            border-radius: 2px;
-        }
-
-        .field {
-            margin-bottom: 20px;
-        }
-
-        .field label {
-            display: block;
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-            color: #555;
-        }
-
-        .field input {
-            width: 100%;
-            padding: 12px 0;
-            border: none;
-            border-bottom: 2px solid #ddd;
-            font-size: 1rem;
-            outline: none;
-            background: transparent;
-            color: #111;
-            transition: border-color 0.2s;
-        }
-
-        .field input.otp-input {
-            font-size: 1.4rem;
-            font-weight: 700;
-            letter-spacing: 6px;
-            text-align: center;
-        }
-
-        .field input:focus {
-            border-bottom-color: #111;
-        }
-
-        .btn-submit {
-            width: 100%;
-            padding: 14px;
-            background: #111;
-            color: #fff;
-            border: none;
-            font-size: 0.85rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            cursor: pointer;
-            margin-top: 8px;
-            transition: background 0.2s;
-        }
-
-        .btn-submit:hover {
-            background: #333;
-        }
-
-        .resend-box {
-            margin-top: 22px;
-            text-align: center;
-            font-size: 0.85rem;
-            color: #888;
-        }
-
-        .resend-box a {
-            color: #111;
-            font-weight: 700;
-            text-decoration: none;
-            border-bottom: 1px solid #111;
-        }
-
-        footer {
-            border-top: 1px solid #ddd;
-            padding: 16px 40px;
-            text-align: center;
-            font-size: 0.8rem;
-            color: #999;
-        }
-    </style>
+    <title>Đặt lại mật khẩu - WebVideo Hub</title>
 </head>
-
 <body>
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card shadow-sm border-0 rounded-3">
+                    <div class="card-body p-4 p-sm-5">
+                        <div class="text-center mb-4">
+                            <div class="bg-primary bg-opacity-10 text-primary d-inline-flex p-3 rounded-circle mb-3">
+                                <i class="fa-solid fa-lock-open fs-3"></i>
+                            </div>
+                            <h3 class="fw-bold text-dark">Đặt Lại Mật Khẩu</h3>
+                            <p class="text-muted small">Nhập mã OTP vừa nhận qua email và mật khẩu mới của bạn.</p>
+                        </div>
 
-    <header>
-        <span class="logo">Võ Công Danh - 24110010</span>
-        <a href="${pageContext.request.contextPath}/login">← Đăng nhập</a>
-    </header>
+                        <%-- Alert Thông báo thành công / gửi lại --%>
+                        <c:if test="${not empty msg}">
+                            <div class="alert alert-info d-flex align-items-center" role="alert">
+                                <i class="fa-solid fa-circle-info me-2 fs-5"></i>
+                                <div>${msg}</div>
+                            </div>
+                        </c:if>
 
-    <main>
-        <div class="form-wrap">
-            <h2>Đặt Lại Mật Khẩu</h2>
-            <p class="subtitle">
-                Nhập mã OTP (6 số) đã được gửi đến email cùng mật khẩu mới của bạn.
-            </p>
+                        <%-- Alert Thông báo lỗi tổng quát --%>
+                        <c:if test="${not empty alert}">
+                            <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center" role="alert">
+                                <i class="fa-solid fa-triangle-exclamation me-2 fs-5"></i>
+                                <div>${alert}</div>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        </c:if>
 
-            <c:if test="${not empty email}">
-                <div class="email-badge">📧 ${email}</div>
-            </c:if>
-            <c:if test="${empty email and not empty sessionScope.forgot_email}">
-                <div class="email-badge">📧 ${sessionScope.forgot_email}</div>
-            </c:if>
+                        <%-- Form Đặt lại mật khẩu --%>
+                        <form action="${pageContext.request.contextPath}/reset-password" method="post" class="needs-validation" novalidate>
+                            <input type="hidden" name="email" value="${email}">
 
-            <c:if test="${not empty alert}">
-                <div class="alert-danger">${alert}</div>
-            </c:if>
+                            <div class="mb-3">
+                                <label for="otp" class="form-label fw-semibold">
+                                    <i class="fa-solid fa-shield-halved me-1 text-secondary"></i>Mã OTP (6 chữ số)
+                                </label>
+                                <input type="text"
+                                       class="form-control text-center fs-5 fw-bold letter-spacing-2 ${not empty errorOtp ? 'is-invalid' : ''}"
+                                       id="otp"
+                                       name="otp"
+                                       placeholder="------"
+                                       maxlength="6"
+                                       pattern="^[0-9]{6}$"
+                                       required autofocus>
+                                <c:choose>
+                                    <c:when test="${not empty errorOtp}">
+                                        <div class="invalid-feedback d-block">${errorOtp}</div>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <div class="invalid-feedback">Vui lòng nhập đúng 6 chữ số OTP.</div>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
 
-            <c:if test="${not empty msg}">
-                <div class="msg-success">${msg}</div>
-            </c:if>
+                            <div class="mb-3">
+                                <label for="newPassword" class="form-label fw-semibold">
+                                    <i class="fa-solid fa-key me-1 text-secondary"></i>Mật khẩu mới
+                                </label>
+                                <input type="password"
+                                       class="form-control ${not empty errorNewPassword ? 'is-invalid' : ''}"
+                                       id="newPassword"
+                                       name="newPassword"
+                                       placeholder="Tối thiểu 6 ký tự"
+                                       minlength="6"
+                                       required>
+                                <c:choose>
+                                    <c:when test="${not empty errorNewPassword}">
+                                        <div class="invalid-feedback d-block">${errorNewPassword}</div>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <div class="invalid-feedback">Mật khẩu mới phải có tối thiểu 6 ký tự.</div>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
 
-            <form action="${pageContext.request.contextPath}/reset-password" method="post">
-                <input type="hidden" name="email" value="${not empty email ? email : sessionScope.forgot_email}">
+                            <div class="mb-4">
+                                <label for="rePassword" class="form-label fw-semibold">
+                                    <i class="fa-solid fa-lock me-1 text-secondary"></i>Xác nhận mật khẩu mới
+                                </label>
+                                <input type="password"
+                                       class="form-control ${not empty errorRePassword ? 'is-invalid' : ''}"
+                                       id="rePassword"
+                                       name="rePassword"
+                                       placeholder="Nhập lại mật khẩu mới"
+                                       minlength="6"
+                                       required>
+                                <c:choose>
+                                    <c:when test="${not empty errorRePassword}">
+                                        <div class="invalid-feedback d-block">${errorRePassword}</div>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <div class="invalid-feedback">Mật khẩu xác nhận không khớp.</div>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
 
-                <div class="field">
-                    <label for="otp">Mã xác nhận OTP (6 chữ số)</label>
-                    <input type="text" id="otp" name="otp" class="otp-input"
-                           maxlength="6" placeholder="______" required autofocus autocomplete="off">
+                            <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold shadow-sm">
+                                <i class="fa-solid fa-circle-check me-2"></i>Xác Nhận Đổi Mật Khẩu
+                            </button>
+                        </form>
+
+                        <div class="d-flex justify-content-between align-items-center mt-4 pt-2 border-top">
+                            <a href="${pageContext.request.contextPath}/resend-otp?email=${email}&type=forgot" class="text-decoration-none small text-primary">
+                                <i class="fa-solid fa-rotate-right me-1"></i>Gửi lại mã OTP
+                            </a>
+                            <a href="${pageContext.request.contextPath}/login" class="text-decoration-none small text-muted">
+                                Đăng nhập
+                            </a>
+                        </div>
+                    </div>
                 </div>
-
-                <div class="field">
-                    <label for="newPassword">Mật khẩu mới</label>
-                    <input type="password" id="newPassword" name="newPassword"
-                           placeholder="Nhập mật khẩu mới" required>
-                </div>
-
-                <div class="field">
-                    <label for="rePassword">Nhập lại mật khẩu mới</label>
-                    <input type="password" id="rePassword" name="rePassword"
-                           placeholder="Nhập lại mật khẩu mới" required>
-                </div>
-
-                <button type="submit" class="btn-submit">Cập nhật mật khẩu</button>
-            </form>
-
-            <div class="resend-box">
-                Chưa nhận được mã OTP?
-                <a href="${pageContext.request.contextPath}/resend-otp?email=${email}&type=forgot">
-                    Gửi lại mã OTP
-                </a>
             </div>
         </div>
-    </main>
+    </div>
 
-    <footer>&copy; 2026 Võ Công Danh - MSSV: 24110010</footer>
+    <%-- Bootstrap validation script --%>
+    <script>
+        (function () {
+            'use strict';
+            var forms = document.querySelectorAll('.needs-validation');
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    var pass = document.getElementById('newPassword').value;
+                    var repass = document.getElementById('rePassword').value;
+                    if (pass && repass && pass !== repass) {
+                        document.getElementById('rePassword').setCustomValidity('Mật khẩu không khớp');
+                    } else {
+                        document.getElementById('rePassword').setCustomValidity('');
+                    }
 
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+    </script>
 </body>
-
 </html>

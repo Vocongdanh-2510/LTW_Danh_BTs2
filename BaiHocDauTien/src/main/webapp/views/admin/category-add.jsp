@@ -4,60 +4,110 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thêm Danh Mục - JPA</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 30px; background-color: #f4f6f9; color: #333; }
-        .form-container { max-width: 600px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        h2 { color: #2c3e50; margin-top: 0; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; font-weight: 600; margin-bottom: 6px; }
-        input[type="text"], input[type="file"] { width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box; }
-        .radio-group { display: flex; align-items: center; gap: 15px; margin-top: 5px; }
-        .radio-group label { font-weight: normal; margin-bottom: 0; cursor: pointer; }
-        .btn-submit { background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 15px; }
-        .btn-submit:hover { background-color: #218838; }
-        .btn-back { display: inline-block; margin-left: 10px; color: #6c757d; text-decoration: none; }
-        .btn-back:hover { text-decoration: underline; }
-    </style>
+    <title>Thêm Danh Mục Mới - Admin Panel</title>
 </head>
 <body>
-<div class="form-container">
-    <h2>Thêm Danh Mục Mới (JPA)</h2>
-    <hr style="margin-bottom: 25px;">
-    <form action="<c:url value="/admin/category/insert"/>" method="post" enctype="multipart/form-data">
-        <div class="form-group">
-            <label for="categoryname">Category name:</label>
-            <input type="text" id="categoryname" name="categoryname" required placeholder="Nhập tên danh mục...">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2"><i class="fa-solid fa-folder-plus text-primary me-2"></i>Thêm Danh Mục Mới</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="<c:url value='/admin/categories'/>" class="btn btn-outline-secondary btn-sm">
+                <i class="fa-solid fa-arrow-left me-1"></i>Quay lại danh sách
+            </a>
         </div>
+    </div>
 
-        <div class="form-group">
-            <label for="images">Link images (URL):</label>
-            <input type="text" id="images" name="images" placeholder="https://example.com/image.jpg">
-        </div>
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
 
-        <div class="form-group">
-            <label for="images1">Upload images (từ máy tính):</label>
-            <input type="file" id="images1" name="images1" accept="image/*">
-        </div>
+                    <c:if test="${not empty error}">
+                        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center" role="alert">
+                            <i class="fa-solid fa-triangle-exclamation me-2 fs-5"></i>
+                            <div>${error}</div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    </c:if>
 
-        <div class="form-group">
-            <label>Status:</label>
-            <div class="radio-group">
-                <label>
-                    <input type="radio" id="ston" name="status" value="1" checked> Hoạt động
-                </label>
-                <label>
-                    <input type="radio" id="stoff" name="status" value="0"> Khóa
-                </label>
+                    <form action="<c:url value='/admin/category/insert'/>" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        
+                        <div class="mb-3">
+                            <label for="categoryname" class="form-label fw-semibold">
+                                Tên danh mục (Category Name) (*)
+                            </label>
+                            <input type="text"
+                                   class="form-control ${not empty error ? 'is-invalid' : ''}"
+                                   id="categoryname"
+                                   name="categoryname"
+                                   value="${categoryname}"
+                                   placeholder="VD: Phim hành động, Khoa học, Hài kịch..."
+                                   minlength="2"
+                                   maxlength="100"
+                                   required autofocus>
+                            <div class="invalid-feedback">
+                                Tên danh mục bắt buộc từ 2 đến 100 ký tự.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="images" class="form-label fw-semibold">
+                                Đường dẫn hình ảnh (URL tùy chọn)
+                            </label>
+                            <input type="text" class="form-control" id="images" name="images" placeholder="https://example.com/cover.jpg">
+                            <div class="form-text">Nhập URL trực tiếp hoặc upload file từ máy tính bên dưới.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="images1" class="form-label fw-semibold">
+                                Upload hình ảnh biểu tượng từ máy tính
+                            </label>
+                            <input type="file" class="form-control" id="images1" name="images1" accept="image/*">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold d-block">Trạng thái (Status)</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="ston" name="status" value="1" checked>
+                                <label class="form-check-label text-success fw-semibold" for="ston">
+                                    <i class="fa-solid fa-circle-check me-1"></i>Hoạt động
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="stoff" name="status" value="0">
+                                <label class="form-check-label text-danger fw-semibold" for="stoff">
+                                    <i class="fa-solid fa-circle-xmark me-1"></i>Khóa
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                                <i class="fa-solid fa-floppy-disk me-1"></i>Lưu Danh Mục (Insert)
+                            </button>
+                            <a class="btn btn-light border px-4" href="<c:url value='/admin/categories'/>">
+                                Hủy bỏ
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
+    </div>
 
-        <div style="margin-top: 25px;">
-            <input type="submit" class="btn-submit" value="Insert">
-            <a class="btn-back" href="<c:url value="/admin/categories"/>">← Quay lại danh sách</a>
-        </div>
-    </form>
-</div>
+    <script>
+        (function () {
+            'use strict';
+            var forms = document.querySelectorAll('.needs-validation');
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+    </script>
 </body>
 </html>
