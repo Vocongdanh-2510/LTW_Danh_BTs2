@@ -54,6 +54,7 @@ public class login_controller extends HttpServlet {
         }
 
         // Chưa đăng nhập -> hiển thị form
+        resp.setContentType("text/html;charset=UTF-8");
         req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
     }
 

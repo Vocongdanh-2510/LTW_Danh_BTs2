@@ -14,3 +14,7 @@ build/
 .metadata/
 *.log
 *.tmp
+
+.idea/
+*.iml
+
